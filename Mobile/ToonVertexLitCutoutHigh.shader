@@ -18,7 +18,7 @@
 		_RampStrength("Shadow Ramp Strength", Range(0,1)) = 0.3
 		_RampSharpness("Shadow Ramp Sharpness", Range(0,0.5)) = 0.1
 
-		// [Space]
+
 		// _SpecularIntensity("Specular Intensity", Float) = 0.2
 		// _SpecularArea("Specular Area", Range(0,1)) = 0.1
 

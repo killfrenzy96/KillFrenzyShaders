@@ -191,18 +191,6 @@
 			#endif
 
 			#define KF_CUTOUT
-			// #define KF_TRANSPARENT
-			// #define KF_TEXTUREALT
-			// #define KF_SHADOW
-			// #define KF_NORMAL
-			// #define KF_SPECULAR
-			// #define KF_EMISSION
-			// #define KF_RIMLIGHT
-			// #define KF_RIMSHADOW
-			// #define KF_OUTLINE
-			// #define KF_CUBEMAP
-			// #define KF_MATCAP
-			// #define KF_HSB
 
 			#include "KillFrenzyToonLitShadow.cginc"
 			ENDCG

@@ -11,7 +11,7 @@
 		_MinBrightness("Minimum Brightness", Range(0,1)) = 0.01
 		_MaxBrightness("Maximum Brightness", Range(0,2)) = 1.0
 
-		// [Space]
+
 		// _Cutoff("Cutoff Alpha", Range(0,1)) = 0.5
 
 
