@@ -1,0 +1,74 @@
+﻿Shader "KillFrenzy/Mobile/Transparent/Toon VertexLit Full"
+{
+	Properties
+	{
+		[Enum(Off,0,Front,1,Back,2)] _Culling("Culling Mode", Int) = 2
+		_VertexColorAlbedo("Vertex Color Tint", Range(0,1)) = 1
+
+
+		_Color("Color Tint", Color) = (1,1,1,1)
+		_MainTex("Texture", 2D) = "white" {}
+		_MinBrightness("Minimum Brightness", Range(0,1)) = 0.01
+		_MaxBrightness("Maximum Brightness", Range(0,2)) = 1.0
+
+		// [Space]
+		// _Cutoff("Cutoff Alpha", Range(0,1)) = 0.5
+
+
+		_RampStrength("Shadow Ramp Strength", Range(0,1)) = 0.3
+		_RampSharpness("Shadow Ramp Sharpness", Range(0,0.5)) = 0.1
+
+
+		_SpecularIntensity("Specular Intensity", Float) = 0.2
+		_SpecularArea("Specular Area", Range(0,1)) = 0.1
+
+
+		_EmissionColor("Emission Color", Color) = (0,0,0,1)
+		[NoScaleOffset]_EmissionMap("Emission Map", 2D) = "black" {}
+
+
+		_RimColor("Rimlight Tint", Color) = (1,1,1,1)
+		_RimIntensity("Rimlight Intensity", Float) = 1
+		_RimRange("Rim Range", Range(0,1)) = 0.5
+		_RimSharpness("Rim Sharpness", Range(0,1)) = 0.1
+
+
+		_ShadowRim("Shadow Rim Tint", Color) = (0.9,0.9,0.9,1)
+		_ShadowRimRange("Shadow Rim Range", Range(0,1)) = 0.7
+		_ShadowRimSharpness("Shadow Rim Sharpness", Range(0,1)) = 0.5
+	}
+
+	SubShader
+	{
+		Tags { "RenderType"="Transparent" "Queue"="Transparent" }
+		Cull [_Culling]
+		LOD 80
+
+		Pass {
+			Tags { "LightMode" = "Vertex" }
+			Blend SrcAlpha OneMinusSrcAlpha
+			ZWrite Off
+			Lighting On
+
+			CGPROGRAM
+			#pragma target 2.0
+			#pragma vertex vert
+			#pragma fragment frag
+
+			// #define KF_CUTOUT
+			#define KF_TRANSPARENT
+			#define KF_SHADOW
+			#define KF_EMISSION
+			#define KF_SPECULAR
+			#define KF_RIMLIGHT
+			#define KF_RIMSHADOW
+
+			#include "KillFrenzyToonVertexLitMain.cginc"
+
+			ENDCG
+		}
+	}
+
+	Fallback "Particles/Alpha Blended"
+	CustomEditor "KillFrenzyToonVertexLitEditor"
+}
