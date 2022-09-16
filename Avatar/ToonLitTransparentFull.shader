@@ -75,7 +75,7 @@
 		[HDR]_MatcapTint("Reflection Tint", Color) = (1,1,1,1)
 		[NoScaleOffset]_BakedCubemap("Cubemap Reflection", CUBE) = "black" {}
 		[NoScaleOffset]_Matcap("Matcap Reflection", 2D) = "black" {}
-		_MatcapTintToDiffuse("Reflection Albedo Tint", Range(0,1)) = 0
+		_MatcapTintToDiffuse("Reflection Albedo Tint", Range(0,1)) = 1
 		[HDR][NoScaleOffset]_ReflectivityMask("Reflection Mask" , 2D) = "white" {}
 		_MatcapArea("Reflection Area", Range(0,1)) = 1
 
