@@ -67,6 +67,8 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 		if (featureEnabled.rimLight) DrawRimLight(materialEditor, ref featureShow.rimLight);
 		if (featureEnabled.rimShadow) DrawRimShadow(materialEditor, ref featureShow.rimShadow);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
+
+		DrawLabel("KillFrenzy's Mobile Avatar Toon VertexLit Shaders v0.9.1");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
