@@ -66,6 +66,7 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 		if (featureEnabled.emission) DrawEmission(materialEditor, ref featureShow.emission);
 		if (featureEnabled.rimLight) DrawRimLight(materialEditor, ref featureShow.rimLight);
 		if (featureEnabled.rimShadow) DrawRimShadow(materialEditor, ref featureShow.rimShadow);
+		DrawAdvanced(materialEditor, ref featureShow.advanced);
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -166,6 +167,21 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 		materialEditor.ShaderProperty(properties._ShadowRimSharpness, new GUIContent("Shadow Rim Sharpness", "Low values will sharpen the rim shadow."));
 
 		DrawSpace();
+	}
+
+	private void DrawAdvanced(MaterialEditor materialEditor, ref bool show) {
+		ShurikenFoldout("Advanced", ref show);
+		if (!show) return;
+
+		DrawLabel("Additional ShaderLab commands. If you don't know what you're doing, leave these values alone.");
+
+		SeparatorThin();
+		materialEditor.ShaderProperty(properties._Stencil, new GUIContent("Stencil ID [0-255]", "The ID of stencil to render to. This should be a whole number from 0 to 255."));
+		materialEditor.ShaderProperty(properties._StencilComp, new GUIContent("Stencil Comparison", "The ID of stencil to compare to. Usually you would use 'Always' when writing the stencil, and use 'Equal' when reading the stencil. Use 'Disabled' to ignore stencil operations."));
+		materialEditor.ShaderProperty(properties._StencilOp, new GUIContent("Stencil Operation", "Usually you want to use 'Replace' when writing the stencil. Use 'Keep' to avoid writing to the stencil."));
+
+		SeparatorThin();
+		materialEditor.ShaderProperty(properties._Offset, new GUIContent("Z Offset", "Depth offset, which moves vectors closer or further from the camera. Often used to avoid Z-fighting."));
 	}
 
 	private static Rect DrawShuriken(string title, Vector2 contentOffset, int HeaderHeight)
@@ -275,6 +291,7 @@ public class KillFrenzyToonVertexLitFeatures
 	public bool emission = false;
 	public bool rimLight = false;
 	public bool rimShadow = false;
+	public bool advanced = false;
 }
 
 public class KillFrenzyToonVertexLitMaterialProperties
@@ -307,6 +324,11 @@ public class KillFrenzyToonVertexLitMaterialProperties
 	public MaterialProperty _ShadowRim = null;
 	public MaterialProperty _ShadowRimRange = null;
 	public MaterialProperty _ShadowRimSharpness = null;
+
+	public MaterialProperty _Stencil = null;
+	public MaterialProperty _StencilComp = null;
+	public MaterialProperty _StencilOp = null;
+	public MaterialProperty _Offset = null;
 }
 
 #endif

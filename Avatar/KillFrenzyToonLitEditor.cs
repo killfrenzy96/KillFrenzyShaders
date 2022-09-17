@@ -94,6 +94,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 			DrawMatCap(materialEditor, ref featureShow.matCap);
 		}
 		if (featureEnabled.hsb) DrawHSB(materialEditor, ref featureShow.hsb);
+		DrawAdvanced(materialEditor, ref featureShow.advanced);
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -311,6 +312,21 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		DrawSpace();
 	}
 
+	private void DrawAdvanced(MaterialEditor materialEditor, ref bool show) {
+		ShurikenFoldout("Advanced", ref show);
+		if (!show) return;
+
+		DrawLabel("Additional ShaderLab commands. If you don't know what you're doing, leave these values alone.");
+
+		SeparatorThin();
+		materialEditor.ShaderProperty(properties._Stencil, new GUIContent("Stencil ID [0-255]", "The ID of stencil to render to. This should be a whole number from 0 to 255."));
+		materialEditor.ShaderProperty(properties._StencilComp, new GUIContent("Stencil Comparison", "The ID of stencil to compare to. Usually you would use 'Always' when writing the stencil, and use 'Equal' when reading the stencil. Use 'Disabled' to ignore stencil operations."));
+		materialEditor.ShaderProperty(properties._StencilOp, new GUIContent("Stencil Operation", "Usually you want to use 'Replace' when writing the stencil. Use 'Keep' to avoid writing to the stencil."));
+
+		SeparatorThin();
+		materialEditor.ShaderProperty(properties._Offset, new GUIContent("Z Offset", "Depth offset, which moves vectors closer or further from the camera. Often used to avoid Z-fighting."));
+	}
+
 	private static Rect DrawShuriken(string title, Vector2 contentOffset, int HeaderHeight)
 	{
 		var style = new GUIStyle("ShurikenModuleTitle");
@@ -424,6 +440,7 @@ public class KillFrenzyToonLitFeatures
 	public bool cubeMap = false;
 	public bool matCap = false;
 	public bool hsb = false;
+	public bool advanced = false;
 }
 
 public class KillFrenzyToonLitMaterialProperties
@@ -497,6 +514,11 @@ public class KillFrenzyToonLitMaterialProperties
 	public MaterialProperty _EmissionHue = null;
 	public MaterialProperty _EmissionSaturation = null;
 	public MaterialProperty _EmissionBrightness = null;
+
+	public MaterialProperty _Stencil = null;
+	public MaterialProperty _StencilComp = null;
+	public MaterialProperty _StencilOp = null;
+	public MaterialProperty _Offset = null;
 }
 
 #endif

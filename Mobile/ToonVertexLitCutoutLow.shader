@@ -36,13 +36,27 @@
 		// _ShadowRim("Shadow Rim Tint", Color) = (0.9,0.9,0.9,1)
 		// _ShadowRimRange("Shadow Rim Range", Range(0,1)) = 0.7
 		// _ShadowRimSharpness("Shadow Rim Sharpness", Range(0,1)) = 0.5
+
+
+		[IntRange]_Stencil("Stencil ID [0-255]", Range(0,255)) = 0
+		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Int) = 0
+		[Enum(UnityEngine.Rendering.StencilOp)] _StencilOp("Stencil Operation", Int) = 0
+		_Offset("Z Offset", Float) = 0
 	}
 
 	SubShader
 	{
 		Tags { "RenderType"="Opaque" }
 		Cull [_Culling]
+		Offset [_Offset], [_Offset]
 		LOD 80
+
+		Stencil
+		{
+			Ref [_Stencil]
+			Comp [_StencilComp]
+			Pass [_StencilOp]
+		}
 
 		Pass {
 			Tags { "LightMode" = "Vertex" }

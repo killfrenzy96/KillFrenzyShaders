@@ -4,7 +4,7 @@
 	{
 		[HDR]_Color("Color Tint", Color) = (1,1,1,1)
 		_MainTex("Texture", 2D) = "white" {}
-		_Stencil("Stencil ID [0;255]", Range(0,255)) = 120
+		[IntRange]_Stencil("Stencil ID [0;255]", Range(0,255)) = 120
 	}
 	SubShader
 	{

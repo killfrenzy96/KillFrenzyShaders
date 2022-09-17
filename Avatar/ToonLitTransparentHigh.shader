@@ -84,14 +84,28 @@
 		_EmissionHue("Emission Hue", Float) = 0
 		_EmissionSaturation("Emission Saturation", Float) = 0
 		_EmissionBrightness("Emission Brightness", Float) = 0
+
+
+		[IntRange]_Stencil("Stencil ID [0-255]", Range(0,255)) = 0
+		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Int) = 0
+		[Enum(UnityEngine.Rendering.StencilOp)] _StencilOp("Stencil Operation", Int) = 0
+		_Offset("Z Offset", Float) = 0
 	}
 
 	SubShader
 	{
 		Tags { "RenderType"="Transparent" "Queue"="Transparent" }
 		Cull [_Culling]
+		Offset [_Offset], [_Offset]
 		ZWrite Off
 		LOD 100
+
+		Stencil
+		{
+			Ref [_Stencil]
+			Comp [_StencilComp]
+			Pass [_StencilOp]
+		}
 
 		Pass
 		{
