@@ -90,6 +90,7 @@
 	{
 		Tags { "RenderType"="Transparent" "Queue"="Transparent" }
 		Cull [_Culling]
+		ZWrite Off
 		LOD 100
 
 		Pass
@@ -97,7 +98,6 @@
 			Name "FORWARD"
 			Tags { "LightMode" = "ForwardBase" }
 			Blend SrcAlpha OneMinusSrcAlpha
-			ZWrite Off
 
 			CGPROGRAM
 			#pragma target 3.0
