@@ -327,6 +327,9 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 
 		SeparatorThin();
 		materialEditor.ShaderProperty(properties._Offset, new GUIContent("Z Offset", "Depth offset, which moves vectors closer or further from the camera. Often used to avoid Z-fighting."));
+
+		SeparatorThin();
+		materialEditor.ShaderProperty(properties._ZClip, new GUIContent("Z Clip", "Setting this to False will make objects visible if they are outside a camera's near and far clip range. There will be Z ordering issues outside the clip range."));
 	}
 
 	private static Rect DrawShuriken(string title, Vector2 contentOffset, int HeaderHeight)
@@ -521,6 +524,7 @@ public class KillFrenzyToonLitMaterialProperties
 	public MaterialProperty _StencilComp = null;
 	public MaterialProperty _StencilOp = null;
 	public MaterialProperty _Offset = null;
+	public MaterialProperty _ZClip = null;
 }
 
 #endif

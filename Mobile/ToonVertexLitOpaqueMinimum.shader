@@ -39,9 +39,10 @@
 
 
 		[IntRange]_Stencil("Stencil ID [0-255]", Range(0,255)) = 0
-		[Enum(UnityEngine.Rendering.CompareFunction)] _StencilComp("Stencil Comparison", Int) = 0
-		[Enum(UnityEngine.Rendering.StencilOp)] _StencilOp("Stencil Operation", Int) = 0
+		[Enum(UnityEngine.Rendering.CompareFunction)]_StencilComp("Stencil Comparison", Int) = 0
+		[Enum(UnityEngine.Rendering.StencilOp)]_StencilOp("Stencil Operation", Int) = 0
 		_Offset("Z Offset", Float) = 0
+		[Enum(False,0,True,1)]_ZClip("Z Clip", Int) = 1
 	}
 
 	SubShader
@@ -49,6 +50,7 @@
 		Tags { "RenderType"="Opaque" }
 		Cull [_Culling]
 		Offset [_Offset], [_Offset]
+		ZClip [_ZClip]
 		LOD 80
 
 		Stencil
