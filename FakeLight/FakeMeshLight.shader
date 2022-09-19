@@ -16,11 +16,12 @@
 			Stencil {
 				Ref [_Stencil]
 				Comp Always
-				Pass Replace
+				Pass Zero
+				ZFail Replace
 			}
 
 			Tags { "LightMode" = "Vertex" }
-			Cull Back
+			Cull Front
 			ZWrite Off
 			ZTest LEqual
 			Blend Zero One
@@ -69,9 +70,9 @@
 			}
 
 			Tags { "LightMode" = "Vertex" }
-			Cull Front
+			Cull Back
 			ZWrite Off
-			ZTest Greater
+			ZTest LEqual
 			Blend DstColor SrcColor
 
 			CGPROGRAM
