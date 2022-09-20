@@ -87,8 +87,8 @@
 		{
 			Name "ShadowCaster"
 			Tags { "LightMode" = "ShadowCaster" }
-
-			ZWrite On ZTest LEqual Cull Off
+			ZWrite On
+			ZTest LEqual
 
 			CGPROGRAM
 			#pragma vertex vert
