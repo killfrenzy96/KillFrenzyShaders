@@ -96,7 +96,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		if (featureEnabled.hsb) DrawHSB(materialEditor, ref featureShow.hsb);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.1c");
+		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.1d");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -330,6 +330,11 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 
 		SeparatorThin();
 		materialEditor.ShaderProperty(properties._ZClip, new GUIContent("Z Clip", "Setting this to False will make objects visible if they are outside a camera's near and far clip range. There will be Z ordering issues outside the clip range."));
+
+		SeparatorThin();
+		materialEditor.RenderQueueField();
+		materialEditor.EnableInstancingField();
+		materialEditor.DoubleSidedGIField();
 	}
 
 	private static Rect DrawShuriken(string title, Vector2 contentOffset, int HeaderHeight)

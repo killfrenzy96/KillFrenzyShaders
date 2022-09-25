@@ -68,7 +68,7 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 		if (featureEnabled.rimShadow) DrawRimShadow(materialEditor, ref featureShow.rimShadow);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Mobile Avatar Toon VertexLit Shaders v0.9.1c");
+		DrawLabel("KillFrenzy's Mobile Avatar Toon VertexLit Shaders v0.9.1d");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -187,6 +187,11 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 
 		SeparatorThin();
 		materialEditor.ShaderProperty(properties._ZClip, new GUIContent("Z Clip", "Setting this to False will make objects visible if they are outside a camera's near and far clip range. There will be Z ordering issues outside the clip range."));
+
+		SeparatorThin();
+		materialEditor.RenderQueueField();
+		materialEditor.EnableInstancingField();
+		materialEditor.DoubleSidedGIField();
 	}
 
 	private static Rect DrawShuriken(string title, Vector2 contentOffset, int HeaderHeight)
