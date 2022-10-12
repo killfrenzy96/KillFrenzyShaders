@@ -1,8 +1,8 @@
-﻿Shader "KillFrenzy/Fake Light/Fake Mesh Light"
+﻿Shader "KillFrenzy/Fake Light/Fake Mesh Shadow"
 {
 	Properties
 	{
-		[HDR]_Color("Color Tint", Color) = (1,1,1,1)
+		_Color("Color Tint", Color) = (0.5,0.5,0.5,1)
 		_MainTex("Texture", 2D) = "white" {}
 		[IntRange]_Stencil("Stencil ID [1;255]", Range(1,255)) = 120
 	}
@@ -17,7 +17,6 @@
 				Ref [_Stencil]
 				Comp Always
 				Pass Zero
-				Fail Zero
 				ZFail Replace
 			}
 
@@ -77,7 +76,7 @@
 			Cull Back
 			ZWrite Off
 			ZTest LEqual
-			Blend DstColor SrcColor
+			Blend DstColor Zero
 
 			CGPROGRAM
 			#pragma vertex vert
@@ -125,7 +124,6 @@
 			fixed4 frag (v2f i): SV_Target
 			{
 				fixed4 col = tex2D(_MainTex, i.uv) * _Color * i.color;
-				col.rgb += 0.5;
 
 				UNITY_APPLY_FOG(i.fogCoord, col);
 				return col;
@@ -144,7 +142,7 @@
 			Cull Front
 			ZWrite Off
 			ZTest GEqual
-			Blend DstColor SrcColor
+			Blend DstColor Zero
 
 			CGPROGRAM
 			#pragma vertex vert
@@ -192,7 +190,6 @@
 			fixed4 frag (v2f i): SV_Target
 			{
 				fixed4 col = tex2D(_MainTex, i.uv) * _Color * i.color;
-				col.rgb += 0.5;
 
 				UNITY_APPLY_FOG(i.fogCoord, col);
 				return col;
