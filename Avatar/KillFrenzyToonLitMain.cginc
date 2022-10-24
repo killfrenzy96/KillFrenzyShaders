@@ -480,14 +480,14 @@ v2f vert(appdata v)
 
 	// Rim light
 	#ifdef KF_RIMLIGHT
-		half rimIntensity = dotSvdn2 * dotNdl;
+		half rimIntensity = dotSvdn2 * max(dotNdl, 0);
 		rimIntensity = smoothstep(_RimRange - _RimSharpness, _RimRange + _RimSharpness, rimIntensity);
 		additiveSoftLit += rimIntensity * lerp(1.0, col, _RimAlbedoTint) * _RimIntensity * _RimColor;
 	#endif
 
 	// Rim shadow
 	#ifdef KF_RIMSHADOW
-		half shadowIntensity = dotSvdn2 * (1 - dotNdl);
+		half shadowIntensity = dotSvdn2 * max(1 - dotNdl, 0);
 		shadowIntensity = smoothstep(_ShadowRimRange - _ShadowRimSharpness, _ShadowRimRange + _ShadowRimSharpness, shadowIntensity);
 		half3 shadowRim = lerp(1.0 - shadowIntensity, 1.0, _ShadowRim);
 		multiply *= shadowRim;
