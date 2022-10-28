@@ -40,6 +40,7 @@
 
 		[HDR]_MatcapTint("Reflection Tint", Color) = (1,1,1,1)
 		[NoScaleOffset]_Matcap("Matcap Reflection", 2D) = "black" {}
+		_MatcapTintToDiffuse("Reflection Albedo Tint", Range(0,1)) = 1
 
 
 		[IntRange]_Stencil("Stencil ID [0-255]", Range(0,255)) = 0

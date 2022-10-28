@@ -182,6 +182,7 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 		SeparatorThin();
 		// materialEditor.ShaderProperty(properties._MatcapTint, new GUIContent("Reflection Tint", "Colour and intensity of the matcap."));
 		materialEditor.TexturePropertySingleLine(new GUIContent("Matcap Reflection", "Texture used for reflection."), properties._Matcap, properties._MatcapTint);
+		materialEditor.ShaderProperty(properties._MatcapTintToDiffuse, new GUIContent("Reflection Albedo Tint", "How much the main texture colour affects the reflection brightness."));
 
 		DrawSpace();
 	}
@@ -353,6 +354,7 @@ public class KillFrenzyToonVertexLitMaterialProperties
 
 	public MaterialProperty _MatcapTint = null;
 	public MaterialProperty _Matcap = null;
+	public MaterialProperty _MatcapTintToDiffuse = null;
 
 	public MaterialProperty _Stencil = null;
 	public MaterialProperty _StencilComp = null;

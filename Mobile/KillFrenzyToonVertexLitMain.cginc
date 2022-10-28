@@ -73,6 +73,7 @@ fixed _VertexColorAlbedo;
 #ifdef KF_MATCAP
 	sampler2D _Matcap;
 	fixed4 _MatcapTint;
+	fixed _MatcapTintToDiffuse;
 #endif
 
 #include "KillFrenzyToonVertexLitHelper.cginc"
@@ -228,7 +229,7 @@ half4 frag(v2f i) : SV_Target
 	// Matcap
 	#ifdef KF_MATCAP
 		half3 matCap = tex2D(_Matcap, i.matcapUV) * _MatcapTint;
-		matCap *= col * 2;
+		matCap *= lerp(1, col * 2, _MatcapTintToDiffuse);
 		col.rgb += matCap;
 	#endif
 
