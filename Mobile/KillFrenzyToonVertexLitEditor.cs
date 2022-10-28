@@ -55,6 +55,7 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 			featureEnabled.emission = true;
 			featureEnabled.rimLight = true;
 			featureEnabled.rimShadow = true;
+			featureEnabled.matCap = true;
 		}
 
 		EditorGUI.BeginChangeCheck();
@@ -66,9 +67,10 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 		if (featureEnabled.emission) DrawEmission(materialEditor, ref featureShow.emission);
 		if (featureEnabled.rimLight) DrawRimLight(materialEditor, ref featureShow.rimLight);
 		if (featureEnabled.rimShadow) DrawRimShadow(materialEditor, ref featureShow.rimShadow);
+		if (featureEnabled.matCap) DrawMatCap(materialEditor, ref featureShow.matCap);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Mobile Avatar Toon VertexLit Shaders v0.9.1f");
+		DrawLabel("KillFrenzy's Mobile Avatar Toon VertexLit Shaders v0.9.2");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -167,6 +169,19 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 		constrainedShaderProperty(materialEditor, properties._ShadowRim, new GUIContent("Shadow Rim Tint", "Colour of the rim shadow."));
 		materialEditor.ShaderProperty(properties._ShadowRimRange, new GUIContent("Shadow Rim Range", "High values will darken more of the model."));
 		materialEditor.ShaderProperty(properties._ShadowRimSharpness, new GUIContent("Shadow Rim Sharpness", "Low values will sharpen the rim shadow."));
+
+		DrawSpace();
+	}
+
+	private void DrawMatCap(MaterialEditor materialEditor, ref bool show) {
+		ShurikenFoldout("Reflection", ref show);
+		if (!show) return;
+
+		DrawLabel("Reflections make the model look shiny. Unlike specular, a texture is provided to give the shine some detail.");
+
+		SeparatorThin();
+		// materialEditor.ShaderProperty(properties._MatcapTint, new GUIContent("Reflection Tint", "Colour and intensity of the matcap."));
+		materialEditor.TexturePropertySingleLine(new GUIContent("Matcap Reflection", "Texture used for reflection."), properties._Matcap, properties._MatcapTint);
 
 		DrawSpace();
 	}
@@ -301,6 +316,7 @@ public class KillFrenzyToonVertexLitFeatures
 	public bool emission = false;
 	public bool rimLight = false;
 	public bool rimShadow = false;
+	public bool matCap = false;
 	public bool advanced = false;
 }
 
@@ -334,6 +350,9 @@ public class KillFrenzyToonVertexLitMaterialProperties
 	public MaterialProperty _ShadowRim = null;
 	public MaterialProperty _ShadowRimRange = null;
 	public MaterialProperty _ShadowRimSharpness = null;
+
+	public MaterialProperty _MatcapTint = null;
+	public MaterialProperty _Matcap = null;
 
 	public MaterialProperty _Stencil = null;
 	public MaterialProperty _StencilComp = null;

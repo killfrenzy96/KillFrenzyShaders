@@ -6,7 +6,7 @@
 		_VertexColorAlbedo("Vertex Color Tint", Range(0,1)) = 1
 
 
-		_Color("Color Tint", Color) = (1,1,1,1)
+		[HDR]_Color("Color Tint", Color) = (1,1,1,1)
 		_MainTex("Texture", 2D) = "white" {}
 		_MinBrightness("Minimum Brightness", Range(0,1)) = 0.01
 		_MaxBrightness("Maximum Brightness", Range(0,2)) = 1.0
@@ -23,11 +23,11 @@
 		_SpecularArea("Specular Area", Range(0,1)) = 0.1
 
 
-		_EmissionColor("Emission Color", Color) = (0,0,0,1)
+		[HDR]_EmissionColor("Emission Color", Color) = (0,0,0,1)
 		[NoScaleOffset]_EmissionMap("Emission Map", 2D) = "black" {}
 
 
-		_RimColor("Rimlight Tint", Color) = (1,1,1,1)
+		[HDR]_RimColor("Rimlight Tint", Color) = (1,1,1,1)
 		_RimIntensity("Rimlight Intensity", Float) = 1
 		_RimRange("Rim Range", Range(0,1)) = 0.5
 		_RimSharpness("Rim Sharpness", Range(0,1)) = 0.1
@@ -36,6 +36,10 @@
 		_ShadowRim("Shadow Rim Tint", Color) = (0.9,0.9,0.9,1)
 		_ShadowRimRange("Shadow Rim Range", Range(0,1)) = 0.7
 		_ShadowRimSharpness("Shadow Rim Sharpness", Range(0,1)) = 0.5
+
+
+		[HDR]_MatcapTint("Reflection Tint", Color) = (1,1,1,1)
+		[NoScaleOffset]_Matcap("Matcap Reflection", 2D) = "black" {}
 
 
 		[IntRange]_Stencil("Stencil ID [0-255]", Range(0,255)) = 0
@@ -78,6 +82,7 @@
 			#define KF_SPECULAR
 			#define KF_RIMLIGHT
 			#define KF_RIMSHADOW
+			#define KF_MATCAP
 
 			#include "KillFrenzyToonVertexLitMain.cginc"
 

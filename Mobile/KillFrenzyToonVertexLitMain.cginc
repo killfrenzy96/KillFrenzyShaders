@@ -23,6 +23,9 @@ struct v2f
 	#else
 		float2 uvShadow: TEXCOORD0;
 	#endif
+	#ifdef KF_MATCAP
+		half2 matcapUV: TEXCOORD1;
+	#endif
 	UNITY_VERTEX_OUTPUT_STEREO
 };
 
@@ -65,6 +68,11 @@ fixed _VertexColorAlbedo;
 	fixed4 _ShadowRim;
 	fixed _ShadowRimRange;
 	fixed _ShadowRimSharpness;
+#endif
+
+#ifdef KF_MATCAP
+	sampler2D _Matcap;
+	fixed4 _MatcapTint;
 #endif
 
 #include "KillFrenzyToonVertexLitHelper.cginc"
@@ -111,7 +119,7 @@ v2f vert(appdata v)
 
 	o.light = fixed4(clamp(lightColor, _MinBrightness, _MaxBrightness), 1.0);
 
-	#if defined(KF_RIMLIGHT) || defined(KF_RIMSHADOW) || defined(KF_SPECULAR)
+	#if defined(KF_RIMLIGHT) || defined(KF_RIMSHADOW) || defined(KF_SPECULAR) || defined(KF_MATCAP)
 		#define KF_LIGHTING_EFFECTS
 	#endif
 
@@ -133,6 +141,7 @@ v2f vert(appdata v)
 		half3 multiply = half3(1, 1, 1);
 
 		half3 worldPos = mul(unity_ObjectToWorld, v.vertex);
+		half3 viewDir = normalize(_WorldSpaceCameraPos - worldPos);
 
 		half3 lightDir = calcLightDir(worldPos, half4(0, 0, 0, 0));
 		half dotNdl = dot(worldNormal, lightDir);
@@ -152,7 +161,6 @@ v2f vert(appdata v)
 
 	// Specular
 	#ifdef KF_SPECULAR
-		half3 viewDir = normalize(_WorldSpaceCameraPos - worldPos);
 		half3 reflLight = normalize(reflect(lightDir, worldNormal));
 		half dotRdv = saturate(dot(reflLight, half4(-viewDir, 0)));
 
@@ -187,6 +195,14 @@ v2f vert(appdata v)
 		multiply *= shadowRim;
 	#endif
 
+	// Matcap
+	#ifdef KF_MATCAP
+		half3 worldUp = half3(0, 1, 0);
+		half3 worldViewUp = normalize(worldUp - viewDir * dot(viewDir, worldUp));
+		half3 worldViewRight = normalize(cross(viewDir, worldViewUp));
+		o.matcapUV = half2(dot(worldViewRight, worldNormal), dot(worldViewUp, worldNormal)) * 0.5 + 0.5;
+	#endif
+
 	// Combine data
 	#ifdef KF_LIGHTING_EFFECTS
 		o.light.rgb += additiveLit;
@@ -196,10 +212,10 @@ v2f vert(appdata v)
 	return o;
 }
 
-fixed4 frag(v2f i) : SV_Target
+half4 frag(v2f i) : SV_Target
 {
 	// Main colour
-	fixed4 col = UNITY_SAMPLE_TEX2D(_MainTex, i.uvShadow.xy) * _Color;
+	half4 col = UNITY_SAMPLE_TEX2D(_MainTex, i.uvShadow.xy) * _Color;
 
 	// Lighting
 	col *= i.light;
@@ -207,6 +223,13 @@ fixed4 frag(v2f i) : SV_Target
 	// Cutout
 	#ifdef KF_CUTOUT
 		clip(col.a - _Cutoff);
+	#endif
+
+	// Matcap
+	#ifdef KF_MATCAP
+		half3 matCap = tex2D(_Matcap, i.matcapUV) * _MatcapTint;
+		matCap *= col * 2;
+		col.rgb += matCap;
 	#endif
 
 	// Light shadows
