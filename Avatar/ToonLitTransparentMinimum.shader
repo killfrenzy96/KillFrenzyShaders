@@ -4,6 +4,7 @@
 	{
 		[Enum(Off,0,Front,1,Back,2)] _Culling("Culling Mode", Int) = 2
 		_VertexColorAlbedo("Vertex Color Tint", Range(0,1)) = 1
+		_VertexColorAlpha("Vertex Color To Alpha", Range(0,1)) = 0
 
 
 		[HDR]_Color("Color Tint", Color) = (1,1,1,1)

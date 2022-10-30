@@ -38,6 +38,10 @@ fixed _MaxBrightness;
 
 fixed _VertexColorAlbedo;
 
+#ifdef KF_TRANSPARENT
+	fixed _VertexColorAlpha;
+#endif
+
 #ifdef KF_CUTOUT
 	fixed _Cutoff;
 #endif
@@ -158,6 +162,10 @@ v2f vert(appdata v)
 		o.light.a *= lerp(1, v.color.a, _VertexColorAlbedo);
 	#else
 		o.light *= lerp(1, v.color, _VertexColorAlbedo);
+	#endif
+
+	#ifdef KF_TRANSPARENT
+		o.light.a *= lerp(1, v.color.r, _VertexColorAlpha);
 	#endif
 
 	// Specular

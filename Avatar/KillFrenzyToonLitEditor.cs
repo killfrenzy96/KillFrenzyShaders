@@ -96,7 +96,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		if (featureEnabled.hsb) DrawHSB(materialEditor, ref featureShow.hsb);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.2");
+		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.2-alpha1");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -105,6 +105,10 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 
 		materialEditor.ShaderProperty(properties._Culling, new GUIContent("Culling Mode", "Off = Draw both front and back faces. Front = Remove front faces. Back = Remove Back faces."));
 		materialEditor.ShaderProperty(properties._VertexColorAlbedo, new GUIContent("Vertex Colour Tint", "Multiply colour by vertex colour data."));
+
+		if (featureEnabled.transparent) {
+			materialEditor.ShaderProperty(properties._VertexColorAlpha, new GUIContent("Vertex Colour Alpha", "Multiply alpha by vertex colour data."));
+		}
 
 		SeparatorThin();
 		// materialEditor.ShaderProperty(properties._Color, new GUIContent("Color Tint", "Main texture colour tint."));
@@ -457,6 +461,7 @@ public class KillFrenzyToonLitMaterialProperties
 {
 	public MaterialProperty _Culling = null;
 	public MaterialProperty _VertexColorAlbedo = null;
+	public MaterialProperty _VertexColorAlpha = null;
 
 	public MaterialProperty _Color = null;
 	public MaterialProperty _MainTex = null;

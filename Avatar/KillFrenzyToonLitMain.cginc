@@ -33,6 +33,10 @@ fixed _ShadowLit;
 
 fixed _VertexColorAlbedo;
 
+#ifdef KF_TRANSPARENT
+	fixed _VertexColorAlpha;
+#endif
+
 #ifdef KF_TEXTUREALT
 	half4 _AltColor;
 	UNITY_DECLARE_TEX2D_NOSAMPLER(_AltTex);
@@ -236,6 +240,10 @@ v2f vert(appdata v)
 	// Vertex colour
 	col *= lerp(1, i.color.rgb, _VertexColorAlbedo);
 	alpha *= lerp(1, i.color.a, _VertexColorAlbedo);
+
+	#ifdef KF_TRANSPARENT
+		alpha *= lerp(1, i.color.r, _VertexColorAlpha);
+	#endif
 
 	// Backface calculations
 	#if defined(KF_NORMAL) || (defined(KF_OUTLINE) && defined(KF_CUTOUT))
