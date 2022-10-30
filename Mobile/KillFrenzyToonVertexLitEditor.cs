@@ -70,7 +70,7 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 		if (featureEnabled.matCap) DrawMatCap(materialEditor, ref featureShow.matCap);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Mobile Avatar Toon VertexLit Shaders v0.9.2-alpha1");
+		DrawLabel("KillFrenzy's Mobile Avatar Toon VertexLit Shaders v0.9.2-alpha2");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -92,6 +92,7 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 		SeparatorThin();
 		materialEditor.ShaderProperty(properties._MinBrightness, new GUIContent("Minimum Brightness", "Lowest lighting brightness level allowed."));
 		materialEditor.ShaderProperty(properties._MaxBrightness, new GUIContent("Maximum Brightness", "Highest lighting brightness level allowed."));
+		materialEditor.ShaderProperty(properties._Contrast, new GUIContent("Contrast Adjustment", "Increases brightness difference between dark and bright colours."));
 
 		DrawSpace();
 	}
@@ -336,6 +337,7 @@ public class KillFrenzyToonVertexLitMaterialProperties
 
 	public MaterialProperty _MinBrightness = null;
 	public MaterialProperty _MaxBrightness = null;
+	public MaterialProperty _Contrast = null;
 
 	public MaterialProperty _Cutoff = null;
 

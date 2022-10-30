@@ -35,6 +35,7 @@ half4 _MainTex_ST;
 
 fixed _MinBrightness;
 fixed _MaxBrightness;
+fixed _Contrast;
 
 fixed _VertexColorAlbedo;
 
@@ -227,6 +228,7 @@ half4 frag(v2f i) : SV_Target
 	half4 col = UNITY_SAMPLE_TEX2D(_MainTex, i.uvShadow.xy) * _Color;
 
 	// Lighting
+	i.light = lerp(i.light, col * i.light * 2, _Contrast); // Contrast adjustment
 	col *= i.light;
 
 	// Cutout

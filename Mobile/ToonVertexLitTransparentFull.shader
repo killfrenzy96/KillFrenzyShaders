@@ -11,6 +11,7 @@
 		_MainTex("Texture", 2D) = "white" {}
 		_MinBrightness("Minimum Brightness", Range(0,1)) = 0.01
 		_MaxBrightness("Maximum Brightness", Range(0,2)) = 1.0
+		_Contrast("Contrast Adjustment", Range(0,1)) = 0.0
 
 
 		// _Cutoff("Cutoff Alpha", Range(0,1)) = 0.5

@@ -96,7 +96,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		if (featureEnabled.hsb) DrawHSB(materialEditor, ref featureShow.hsb);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.2-alpha1");
+		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.2-alpha2");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
