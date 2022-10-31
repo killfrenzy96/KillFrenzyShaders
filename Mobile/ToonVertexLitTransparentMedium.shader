@@ -68,6 +68,7 @@
 		}
 
 		Pass {
+			Name "VERTEX"
 			Tags { "LightMode" = "Vertex" }
 			Blend SrcAlpha OneMinusSrcAlpha
 			ZWrite Off
