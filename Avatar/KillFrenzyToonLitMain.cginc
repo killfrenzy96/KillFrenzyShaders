@@ -567,17 +567,19 @@ v2f vert(appdata v)
 
 		// Outlines Part 2
 		#ifdef KF_OUTLINE
+			half outlineVisibility = (outlineWidth.r / cameraDistance.r) - ((1080.0 * 0.1) / _ScreenParams.y);
 			if (
-				(outlineWidth.r / cameraDistance.r) > (1080.0 * 0.05) / _ScreenParams.y && // Skip if outline is too small to see
+				outlineVisibility > 0.0 && // Skip if outline is too small to see
 				outlineWidthMask.r + outlineWidthMask.g + outlineWidthMask.b > 0.01 // Skip if outline is masked out
 			) {
+				outlineVisibility = smoothstep(outlineVisibility * 100.0, 0.0, 1.0);
 				outlineWidth *= min(cameraDistance * 3, 1) * .01;
 
 				[unroll]
 				for (int j = 2; j >= 0; j--) {
 					IN[j].vertex.xyz += normalize(IN[j].normal) * outlineWidth[j];
 					IN[j].pos = UnityObjectToClipPos(IN[j].vertex.xyz);
-					IN[j].outlineColor = half4(_OutlineColor.rgb, outlineWidthMask[j]);
+					IN[j].outlineColor = half4(lerp(1.0, _OutlineColor.rgb, outlineVisibility), outlineWidthMask[j]);
 
 					triStream.Append(IN[j]);
 				}
