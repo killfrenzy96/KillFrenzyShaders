@@ -553,6 +553,8 @@ v2f vert(appdata v)
 				IN[1].outlineColor.b,
 				IN[2].outlineColor.b
 			);
+
+			half fov = atan(1.0f / unity_CameraProjection._m11) * (360.0 / UNITY_PI);
 		#endif
 
 		// Main mesh
@@ -567,7 +569,7 @@ v2f vert(appdata v)
 
 		// Outlines Part 2
 		#ifdef KF_OUTLINE
-			half outlineVisibility = (outlineWidth.r / cameraDistance.r) - ((1080.0 * 0.1) / _ScreenParams.y);
+			half outlineVisibility = ((outlineWidth.r / cameraDistance.r) - ((1080.0 * 0.1) / _ScreenParams.y)) * (60.0 / fov);
 			if (
 				outlineVisibility > 0.0 && // Skip if outline is too small to see
 				outlineWidthMask.r + outlineWidthMask.g + outlineWidthMask.b > 0.01 // Skip if outline is masked out
