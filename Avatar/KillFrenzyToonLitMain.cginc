@@ -569,7 +569,7 @@ v2f vert(appdata v)
 
 		// Outlines Part 2
 		#ifdef KF_OUTLINE
-			half outlineVisibility = ((outlineWidth.r / cameraDistance.r) - ((1080.0 * 0.1) / _ScreenParams.y)) * (60.0 / fov);
+			half outlineVisibility = (outlineWidth.r / cameraDistance.r) - (((1080.0 * 0.1) / _ScreenParams.y) * (fov / 60.0));
 			if (
 				outlineVisibility > 0.0 && // Skip if outline is too small to see
 				outlineWidthMask.r + outlineWidthMask.g + outlineWidthMask.b > 0.01 // Skip if outline is masked out
