@@ -52,6 +52,11 @@
 		_ScaleWithLightSensitivity("Emission Scale with Light", Range(0,1)) = 0
 
 
+		[HDR]_EmissionAltColor("Alternate Emission Color", Color) = (0,0,0,1)
+		[NoScaleOffset]_EmissionMapAlt("Alternate Emission Map", 2D) = "white" {}
+		_EmissionMapAltStrength("Alternate Emission Strength", Range(0,1)) = 0
+
+
 		_RimColor("Rimlight Tint", Color) = (1,1,1,1)
 		_RimAlbedoTint("Rimlight Albedo Tint", Range(0,1)) = 1
 		_RimIntensity("Rimlight Intensity", Float) = 1
@@ -137,6 +142,7 @@
 			#define KF_NORMAL
 			#define KF_SPECULAR
 			#define KF_EMISSION
+			#define KF_EMISSIONALT
 			#define KF_RIMLIGHT
 			#define KF_RIMSHADOW
 			#define KF_OUTLINE
@@ -177,6 +183,7 @@
 			#define KF_NORMAL
 			#define KF_SPECULAR
 			#define KF_EMISSION
+			#define KF_EMISSIONALT
 			#define KF_RIMLIGHT
 			#define KF_RIMSHADOW
 			#define KF_OUTLINE

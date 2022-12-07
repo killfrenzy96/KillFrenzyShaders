@@ -9,6 +9,7 @@
 // #define KF_NORMAL
 // #define KF_SPECULAR
 // #define KF_EMISSION
+// #define KF_EMISSIONALT
 // #define KF_RIMLIGHT
 // #define KF_RIMSHADOW
 // #define KF_OUTLINE
@@ -75,6 +76,12 @@ fixed _VertexColorAlbedo;
 	UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionMap);
 	half4 _EmissionColor;
 	fixed _ScaleWithLightSensitivity;
+#endif
+
+#ifdef KF_EMISSIONALT
+	UNITY_DECLARE_TEX2D_NOSAMPLER(_EmissionMapAlt);
+	half4 _EmissionAltColor;
+	fixed _EmissionMapAltStrength;
 #endif
 
 #ifdef KF_RIMLIGHT
@@ -294,6 +301,9 @@ v2f vert(appdata v)
 	// Emission colour
 	#ifdef KF_EMISSION
 		half4 emissionMap = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionMap, _MainTex, i.uv) * _EmissionColor;
+		#ifdef KF_EMISSIONALT
+			emissionMap = lerp(emissionMap, UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionMapAlt, _MainTex, i.uv) * _EmissionAltColor, _EmissionMapAltStrength);
+		#endif
 		half3 emission = emissionMap.rgb;
 		emission.rgb *= emissionMap.a;
 	#endif

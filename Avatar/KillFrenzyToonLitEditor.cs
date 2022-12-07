@@ -58,6 +58,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 			featureEnabled.shadow = true;
 			featureEnabled.specular = true;
 			featureEnabled.emission = true;
+			featureEnabled.emissionAlt = true;
 			featureEnabled.rimLight = true;
 			featureEnabled.rimShadow = true;
 			featureEnabled.matCap = true;
@@ -69,6 +70,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 			featureEnabled.normal = true;
 			featureEnabled.specular = true;
 			featureEnabled.emission = true;
+			featureEnabled.emissionAlt = true;
 			featureEnabled.rimLight = true;
 			featureEnabled.rimShadow = true;
 			featureEnabled.cubeMap = true;
@@ -85,6 +87,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		if (featureEnabled.normal) DrawNormal(materialEditor, ref featureShow.normal);
 		if (featureEnabled.specular) DrawSpecular(materialEditor, ref featureShow.specular);
 		if (featureEnabled.emission) DrawEmission(materialEditor, ref featureShow.emission);
+		if (featureEnabled.emissionAlt) DrawEmissionAlt(materialEditor, ref featureShow.emissionAlt);
 		if (featureEnabled.rimLight) DrawRimLight(materialEditor, ref featureShow.rimLight);
 		if (featureEnabled.rimShadow) DrawRimShadow(materialEditor, ref featureShow.rimShadow);
 		if (featureEnabled.outline) DrawOutline(materialEditor, ref featureShow.outline);
@@ -216,6 +219,20 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		// materialEditor.ShaderProperty(properties._EmissionColor, new GUIContent("Emission Color", "Emission colour tint. Alpha also affects emission intensity."));
 		materialEditor.TexturePropertySingleLine(new GUIContent("Emission Map", "Texture for emission. This will makes the model glow. Alpha will affect emission intensity."), properties._EmissionMap, properties._EmissionColor);
 		materialEditor.ShaderProperty(properties._ScaleWithLightSensitivity, new GUIContent("Emission Scale with Light", "Prevents the emission from making the model glow in the dark."));
+
+		DrawSpace();
+	}
+
+	private void DrawEmissionAlt(MaterialEditor materialEditor, ref bool show) {
+		ShurikenFoldout("Alternate Emission", ref show);
+		if (!show) return;
+
+		DrawLabel("The alternate emission replaces the main emission texture depending on the 'Alternate Emission Strength' value.");
+
+		SeparatorThin();
+		// materialEditor.ShaderProperty(properties._AltColor, new GUIContent("Alternate Color Tint", "Alternate texture colour tint."));
+		materialEditor.TexturePropertySingleLine(new GUIContent("Alternate Emission Texture", "Alternate texture to replace the emission texture."), properties._EmissionMapAlt, properties._EmissionAltColor);
+		materialEditor.ShaderProperty(properties._EmissionMapAltStrength, new GUIContent("Alternate Emission Strength", "1 will completely replace the emission texture with the alternate texture. 0 will only use the emission texture."));
 
 		DrawSpace();
 	}
@@ -448,6 +465,7 @@ public class KillFrenzyToonLitFeatures
 	public bool normal = false;
 	public bool specular = false;
 	public bool emission = false;
+	public bool emissionAlt = false;
 	public bool rimLight = false;
 	public bool rimShadow = false;
 	public bool outline = false;
@@ -499,6 +517,10 @@ public class KillFrenzyToonLitMaterialProperties
 	public MaterialProperty _EmissionColor = null;
 	public MaterialProperty _EmissionMap = null;
 	public MaterialProperty _ScaleWithLightSensitivity = null;
+
+	public MaterialProperty _EmissionAltColor = null;
+	public MaterialProperty _EmissionMapAlt = null;
+	public MaterialProperty _EmissionMapAltStrength = null;
 
 	public MaterialProperty _RimColor = null;
 	public MaterialProperty _RimAlbedoTint = null;
