@@ -205,6 +205,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		materialEditor.ShaderProperty(properties._SpecularIntensity, new GUIContent("Specular Intensity", "Stength of the specular effect."));
 		materialEditor.ShaderProperty(properties._SpecularAlbedoTint, new GUIContent("Specular Albedo Tint", "How much the main texture colour affects the specular brightness."));
 		materialEditor.ShaderProperty(properties._SpecularArea, new GUIContent("Specular Area", "Low values will blur the specular over a larger area. High values will focus the specular on a smaller area."));
+		materialEditor.ShaderProperty(properties._SpecularSharpness, new GUIContent("Specular Sharpness", "Low values will sharpen the specular."));
 
 		DrawSpace();
 	}
@@ -513,6 +514,7 @@ public class KillFrenzyToonLitMaterialProperties
 	public MaterialProperty _SpecularAlbedoTint = null;
 	public MaterialProperty _SpecularIntensity = null;
 	public MaterialProperty _SpecularArea = null;
+	public MaterialProperty _SpecularSharpness = null;
 
 	public MaterialProperty _EmissionColor = null;
 	public MaterialProperty _EmissionMap = null;

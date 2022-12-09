@@ -70,6 +70,7 @@ fixed _VertexColorAlbedo;
 	half _SpecularIntensity;
 	fixed _SpecularAlbedoTint;
 	fixed _SpecularArea;
+	fixed _SpecularSharpness;
 #endif
 
 #ifdef KF_EMISSION
@@ -489,11 +490,8 @@ v2f vert(appdata v)
 
 		smoothness *= 192;
 		half reflectionUntouched = min(exp2(smoothness * dotRdv - smoothness), 1.0); // Optimized estimation
-
-		half3 specular = reflectionUntouched * specularIntensity * (_SpecularArea + 0.5);
-
-		specular = lerp(specular, specular * col, _SpecularAlbedoTint * specularMap.g); // Should specular highlight be tinted based on the albedo of the object?
-		additiveSoftLit += specular;
+		half specular = smoothstep(max(_SpecularArea - _SpecularSharpness, 0.0), min(_SpecularArea + _SpecularSharpness, 1.0), reflectionUntouched) * specularIntensity;
+		additiveSoftLit += lerp(specular, col * specular, _SpecularAlbedoTint * specularMap.g); // Should specular highlight be tinted based on the albedo of the object?
 	#endif
 
 	// Rim light

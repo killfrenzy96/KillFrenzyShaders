@@ -45,6 +45,7 @@
 		_SpecularAlbedoTint("Specular Albedo Tint", Range(0,1)) = 1
 		_SpecularIntensity("Specular Intensity", Float) = 0.2
 		_SpecularArea("Specular Area", Range(0,1)) = 0.1
+		_SpecularSharpness("Specular Sharpness", Range(0,1)) = 0.1
 
 
 		[HDR]_EmissionColor("Emission Color", Color) = (0,0,0,1)
