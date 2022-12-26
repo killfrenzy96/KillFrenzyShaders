@@ -95,6 +95,12 @@
 		_EmissionHue("Emission Hue", Float) = 0
 		_EmissionSaturation("Emission Saturation", Float) = 0
 		_EmissionBrightness("Emission Brightness", Float) = 0
+		_RainbowMainHueUVX("Rainbow Hue UV X", Float) = 0
+		_RainbowMainHueUVY("Rainbow Hue UV Y", Float) = 0
+		_RainbowMainHueSpeed("Rainbow Hue Speed", Float) = 0
+		_RainbowEmissionHueUVX("Rainbow Hue UV X", Float) = 0
+		_RainbowEmissionHueUVY("Rainbow Hue UV Y", Float) = 0
+		_RainbowEmissionHueSpeed("Rainbow Hue Speed", Float) = 0
 
 
 		[IntRange]_Stencil("Stencil ID [0-255]", Range(0,255)) = 0

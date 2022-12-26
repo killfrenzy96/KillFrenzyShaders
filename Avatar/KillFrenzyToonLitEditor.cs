@@ -333,6 +333,16 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		materialEditor.ShaderProperty(properties._EmissionSaturation, new GUIContent("Emission Saturation", "Emission texture saturation slider. -1 will be grayscale. High values will saturate the emission texture."));
 		materialEditor.ShaderProperty(properties._EmissionBrightness, new GUIContent("Emission Brightness", "Emission texture brightness slider. -1 will be black. High values will brighten the emission texture."));
 
+		SeparatorThin();
+		materialEditor.ShaderProperty(properties._RainbowMainHueUVX, new GUIContent("Rainbow Main Hue UV X", "Creates a rainbow hue gradient for the main texture on the X axis of the UV."));
+		materialEditor.ShaderProperty(properties._RainbowMainHueUVY, new GUIContent("Rainbow Main Hue UV Y", "Creates a rainbow hue gradient for the main texture on the Y axis of the UV."));
+		materialEditor.ShaderProperty(properties._RainbowMainHueSpeed, new GUIContent("Rainbow Main Hue Speed", "The speed which the rainbow hue for the main texture will animate at."));
+
+		SeparatorThin();
+		materialEditor.ShaderProperty(properties._RainbowEmissionHueUVX, new GUIContent("Rainbow Emission Hue UV X", "Creates a rainbow hue gradient for the emission texture on the X axis of the UV."));
+		materialEditor.ShaderProperty(properties._RainbowEmissionHueUVY, new GUIContent("Rainbow Emission Hue UV Y", "Creates a rainbow hue gradient for the emission texture on the Y axis of the UV."));
+		materialEditor.ShaderProperty(properties._RainbowEmissionHueSpeed, new GUIContent("Rainbow Emission Hue Speed", "The speed which the rainbow for the emission texture hue will animate at."));
+
 		DrawSpace();
 	}
 
@@ -553,6 +563,12 @@ public class KillFrenzyToonLitMaterialProperties
 	public MaterialProperty _EmissionHue = null;
 	public MaterialProperty _EmissionSaturation = null;
 	public MaterialProperty _EmissionBrightness = null;
+	public MaterialProperty _RainbowMainHueUVX = null;
+	public MaterialProperty _RainbowMainHueUVY = null;
+	public MaterialProperty _RainbowMainHueSpeed = null;
+	public MaterialProperty _RainbowEmissionHueUVX = null;
+	public MaterialProperty _RainbowEmissionHueUVY = null;
+	public MaterialProperty _RainbowEmissionHueSpeed = null;
 
 	public MaterialProperty _Stencil = null;
 	public MaterialProperty _StencilComp = null;

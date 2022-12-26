@@ -133,6 +133,12 @@ fixed _VertexColorAlbedo;
 		half _EmissionSaturation;
 		half _EmissionBrightness;
 	#endif
+	float _RainbowMainHueUVX;
+	float _RainbowMainHueUVY;
+	float _RainbowMainHueSpeed;
+	float _RainbowEmissionHueUVX;
+	float _RainbowEmissionHueUVY;
+	float _RainbowEmissionHueSpeed;
 #endif
 
 struct appdata
@@ -315,13 +321,13 @@ v2f vert(appdata v)
 		half4 hslaMaskEmission = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskEmission, _MainTex, i.uv);
 
 		// col = hue(col, half4(_HSLAAdjust.x, 0.0, _HSLAAdjust.zw), hslaMask.rgb); // Main Hue/Brightness
-		col = lerp(col, applyHue(col, _MainHue), hslaMask.r); // Main Hue
+		col = lerp(col, applyHue(col, _RainbowMainHueUVX * i.uv.x + _RainbowMainHueUVY * i.uv.y + _RainbowMainHueSpeed * _Time.y + _MainHue), hslaMask.r); // Main Hue
 		col = lerp(dot(col, grayscaleVec), col, (_MainSaturation * hslaMask.g) + 1.0); // Main Saturation
 		col *= 1.0 + _MainBrightness * hslaMask.b; // Main Brightness
 
 		#ifdef KF_EMISSION
 			// emission = hue(emission, half4(_HSLAAdjustEmission.x, 0.0, _HSLAAdjustEmission.zw), hslaMaskEmission); // Emission Hue/Brightness
-			emission = lerp(emission, applyHue(emission, _EmissionHue), hslaMaskEmission.r); // Emission Hue
+			emission = lerp(emission, applyHue(emission, _RainbowEmissionHueUVX * i.uv.x + _RainbowEmissionHueUVY * i.uv.y + _RainbowEmissionHueSpeed * _Time.y + _EmissionHue), hslaMaskEmission.r); // Emission Hue
 			emission = lerp(dot(emission, grayscaleVec), emission, (_EmissionSaturation * hslaMaskEmission.g) + 1.0); // Emission Saturation
 			emission *= 1.0 + _EmissionBrightness * hslaMaskEmission.b; // Emission Brightness
 		#endif
