@@ -111,6 +111,12 @@ v2f vert(appdata v)
 		toLight *= rsqrt(lengthSq);
 
 		half atten = 1.0 / (1.0 + lengthSq * unity_LightAtten[i].z);
+		if (unity_LightAtten[i].x != -1 && unity_LightAtten[i].y != 1) // if spotlight
+		{
+			float rho = max (0, dot(toLight, unity_SpotDirection[i].xyz));
+			float spotAtt = (rho - unity_LightAtten[i].x) * unity_LightAtten[i].y;
+			atten *= saturate(spotAtt);
+		}
 		half diff = max (0, dot (viewN, toLight));
 		half3 light = unity_LightColor[i].rgb * atten;
 
