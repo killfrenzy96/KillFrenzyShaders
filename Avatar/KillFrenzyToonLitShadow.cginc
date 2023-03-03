@@ -6,8 +6,10 @@ struct appdata
 	float4 vertex: POSITION;
 	float3 normal: NORMAL;
 	#ifdef KF_CUTOUT
-		float2 uv: TEXCOORD0;
 		fixed4 color: COLOR;
+	#endif
+	#if defined(KF_CUTOUT) || defined(KF_OUTLINE)
+		float2 uv: TEXCOORD0;
 	#endif
 	UNITY_VERTEX_INPUT_INSTANCE_ID
 };
@@ -17,19 +19,28 @@ struct v2f
 	V2F_SHADOW_CASTER;
 	#ifdef KF_CUTOUT
 		fixed4 color: COLOR;
+	#endif
+	#if defined(KF_CUTOUT) || defined(KF_OUTLINE)
 		float2 uv: TEXCOORD0;
 	#endif
 	UNITY_VERTEX_OUTPUT_STEREO
 };
 
-#ifdef KF_CUTOUT
+#if defined(KF_CUTOUT) || defined(KF_OUTLINE)
 	sampler2D _MainTex;
 	float4 _MainTex_ST;
+#endif
 
+#ifdef KF_CUTOUT
 	fixed _VertexColorAlbedo;
 
 	fixed _Cutoff;
 	fixed _AlphaNoise;
+#endif
+
+#ifdef KF_OUTLINE
+	sampler2D _OutlineMask;
+	fixed _OutlineWidth;
 #endif
 
 v2f vert (appdata v)
@@ -37,11 +48,26 @@ v2f vert (appdata v)
 	v2f o;
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-	TRANSFER_SHADOW_CASTER_NORMALOFFSET(o);
+
 	#ifdef KF_CUTOUT
 		o.color = v.color;
+	#endif
+
+	#if defined(KF_CUTOUT) || defined(KF_OUTLINE)
 		o.uv = TRANSFORM_TEX(v.uv, _MainTex);
 	#endif
+
+	#ifdef KF_OUTLINE
+		float3 worldPos = mul(unity_ObjectToWorld, v.vertex);
+		half outlineWidthMask = tex2Dlod(_OutlineMask, float4(o.uv, 0, 0)).r;
+		half cameraDistance = distance(worldPos, _WorldSpaceCameraPos);
+		half outlineWidth = outlineWidthMask * _OutlineWidth;
+		outlineWidth *= min(cameraDistance * 3, 1) * .01;
+		v.vertex.xyz += normalize(v.normal) * outlineWidth;
+	#endif
+
+	TRANSFER_SHADOW_CASTER_NORMALOFFSET(o);
+
 	return o;
 }
 

@@ -220,6 +220,7 @@
 				#define UNITY_PASS_SHADOWCASTER
 			#endif
 
+			// #define KF_OUTLINE
 			#define KF_CUTOUT
 
 			#include "KillFrenzyToonLitShadow.cginc"
