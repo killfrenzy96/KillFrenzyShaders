@@ -66,7 +66,7 @@ v2f vert (appdata v)
 		half fov = atan(1.0f / unity_CameraProjection._m11) * (360.0 / UNITY_PI);
 		half outlineVisibility = (outlineWidth / cameraDistance) - (((1080.0 * 0.1) / _ScreenParams.y) * (fov / 60.0));
 		outlineWidth *= min(cameraDistance * 3, 1) * .01;
-		if (outlineVisibility <= 0.0) outlineWidth = 0;
+		if (outlineVisibility < 0.005) outlineWidth = 0;
 
 		v.vertex.xyz += normalize(v.normal) * outlineWidth;
 	#endif
