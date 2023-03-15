@@ -25,6 +25,7 @@
 
 
 		[Enum(Off,0,On,1)] _AlphaMask ("Alpha To Mask", Int) = 1
+		_AlphaToMaskSharpen("Alpha To Mask Sharpen", Range(0,1)) = 1
 		_Cutoff("Cutoff Alpha", Range(0,1)) = 0.01
 		_AlphaNoise("Cutoff Noise", Range(0,2)) = 0.0
 

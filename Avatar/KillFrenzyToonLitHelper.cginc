@@ -188,3 +188,12 @@ half3 smoothMin(half3 col, half maxValue)
 	}
 	// return min(col, maxValue);
 }
+
+float CalcMipLevel(float2 texture_coord)
+{
+	float2 dx = ddx(texture_coord);
+	float2 dy = ddy(texture_coord);
+	float delta_max_sqr = max(dot(dx, dx), dot(dy, dy));
+
+	return max(0.0, 0.5 * log2(delta_max_sqr));
+}

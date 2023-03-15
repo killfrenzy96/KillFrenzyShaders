@@ -152,9 +152,12 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		DrawLabel("Cutout will hide parts of the model based on the alpha channel of the main texture.");
 
 		SeparatorThin();
-		materialEditor.ShaderProperty(properties._AlphaMask, new GUIContent("Alpha To Mask", "Softens the cutout with transparency when MSAA is enabled."));
 		materialEditor.ShaderProperty(properties._Cutoff, new GUIContent("Cutoff", "Minimum alpha level where texture is visible."));
 		materialEditor.ShaderProperty(properties._AlphaNoise, new GUIContent("Cutoff Noise", "Applies noise to the cutoff to help smoothen the cutout."));
+
+		SeparatorThin();
+		materialEditor.ShaderProperty(properties._AlphaMask, new GUIContent("Alpha To Mask", "Softens the cutout with transparency when MSAA is enabled."));
+		materialEditor.ShaderProperty(properties._AlphaToMaskSharpen, new GUIContent("Alpha To Mask Sharpen", "Sharpens the blurry edges caused by Alpha To Mask."));
 
 		DrawSpace();
 	}
@@ -507,6 +510,7 @@ public class KillFrenzyToonLitMaterialProperties
 	public MaterialProperty _ShadowLit = null;
 
 	public MaterialProperty _AlphaMask = null;
+	public MaterialProperty _AlphaToMaskSharpen = null;
 	public MaterialProperty _Cutoff = null;
 	public MaterialProperty _AlphaNoise = null;
 

@@ -36,6 +36,8 @@ struct v2f
 
 	fixed _Cutoff;
 	fixed _AlphaNoise;
+	fixed _AlphaToMaskSharpen;
+	float4 _MainTex_TexelSize;
 #endif
 
 #ifdef KF_OUTLINE
@@ -86,6 +88,7 @@ fixed4 frag (v2f i) : SV_Target
 		alpha *= lerp(1, i.color.a, _VertexColorAlbedo);
 
 		// Cutout
+		alpha = lerp(alpha, (alpha - _Cutoff) / max(fwidth(alpha), 0.0001) + 0.5, _AlphaToMaskSharpen);
 		alpha *= (1.0 - _AlphaNoise * 0.5) + frac(frac(_Time.a * dot(i.uv, float2(12.9898, 78.233))) * 43758.5453123) * _AlphaNoise;
 		clip(alpha * (1 + _Cutoff) - _Cutoff);
 	#endif

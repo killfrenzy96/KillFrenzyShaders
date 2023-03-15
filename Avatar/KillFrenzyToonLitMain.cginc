@@ -47,6 +47,8 @@ fixed _VertexColorAlbedo;
 #ifdef KF_CUTOUT
 	fixed _Cutoff;
 	fixed _AlphaNoise;
+	fixed _AlphaToMaskSharpen;
+	float4 _MainTex_TexelSize;
 #endif
 
 #ifdef KF_SHADOW
@@ -283,6 +285,8 @@ v2f vert(appdata v)
 
 	// Cutout
 	#ifdef KF_CUTOUT
+		// alpha *= 1 + CalcMipLevel(i.uv * _MainTex_TexelSize.zw) * 0.25;
+		alpha = lerp(alpha, (alpha - _Cutoff) / max(fwidth(alpha), 0.0001) + 0.5, _AlphaToMaskSharpen);
 		alpha *= (1.0 - _AlphaNoise * 0.5) + frac(frac(_Time.a * dot(i.uv, float2(12.9898, 78.233))) * 43758.5453123) * _AlphaNoise;
 		clip(alpha * (1 + _Cutoff) - _Cutoff);
 	#endif
