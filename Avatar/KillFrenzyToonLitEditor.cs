@@ -155,9 +155,11 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		materialEditor.ShaderProperty(properties._Cutoff, new GUIContent("Cutoff", "Minimum alpha level where texture is visible."));
 		materialEditor.ShaderProperty(properties._AlphaNoise, new GUIContent("Cutoff Noise", "Applies noise to the cutoff to help smoothen the cutout."));
 
-		SeparatorThin();
-		materialEditor.ShaderProperty(properties._AlphaMask, new GUIContent("Alpha To Mask", "Softens the cutout with transparency when MSAA is enabled."));
-		materialEditor.ShaderProperty(properties._AlphaToMaskSharpen, new GUIContent("Alpha To Mask Sharpen", "Sharpens the blurry edges caused by Alpha To Mask."));
+		if (!featureEnabled.transparent) {
+			SeparatorThin();
+			materialEditor.ShaderProperty(properties._AlphaMask, new GUIContent("Alpha To Mask", "Softens the cutout with transparency when MSAA is enabled."));
+			materialEditor.ShaderProperty(properties._AlphaToMaskSharpen, new GUIContent("Alpha To Mask Sharpen", "Sharpens the blurry edges caused by Alpha To Mask."));
+		}
 
 		DrawSpace();
 	}
