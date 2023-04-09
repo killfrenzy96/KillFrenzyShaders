@@ -49,9 +49,9 @@
 		_SpecularSharpness("Specular Sharpness", Range(0,1)) = 0.5
 
 
-		// [HDR]_EmissionColor("Emission Color", Color) = (0,0,0,1)
-		// [NoScaleOffset]_EmissionMap("Emission Map", 2D) = "white" {}
-		// _ScaleWithLightSensitivity("Emission Scale with Light", Range(0,1)) = 0
+		[HDR]_EmissionColor("Emission Color", Color) = (0,0,0,1)
+		[NoScaleOffset]_EmissionMap("Emission Map", 2D) = "white" {}
+		_ScaleWithLightSensitivity("Emission Scale with Light", Range(0,1)) = 0
 
 
 		// [HDR]_EmissionAltColor("Alternate Emission Color", Color) = (0,0,0,1)
