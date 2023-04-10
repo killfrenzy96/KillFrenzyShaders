@@ -180,6 +180,9 @@ struct v2f
 	#ifdef KF_OUTLINE
 		half4 outlineColor: TEXCOORD10;
 	#endif
+	#ifdef KF_VERTEX
+		float4 light: TEXCOORD11;
+	#endif
 	UNITY_VERTEX_OUTPUT_STEREO
 };
 
@@ -226,6 +229,35 @@ v2f vert(appdata v)
 		o.tspace2 = half3(wTangent.z, wBitangent.z, o.worldNormal.z);
 	#endif
 
+	#ifdef KF_VERTEX
+		half3 viewPos = UnityObjectToViewPos(v.vertex.xyz);
+		half3 viewNormal = normalize(mul((float3x3)UNITY_MATRIX_IT_MV, v.normal));
+
+		[unroll]
+		for (int k = 0; k < 4; k++) {
+			half3 toLight = unity_LightPosition[k].xyz - viewPos.xyz * unity_LightPosition[k].w;
+			half lengthSq = dot(toLight, toLight);
+
+			// don't produce NaNs if some vertex position overlaps with the light
+			lengthSq = max(lengthSq, 0.000001);
+
+			toLight *= rsqrt(lengthSq);
+
+			half atten = 1.0 / (1.0 + lengthSq * unity_LightAtten[k].z);
+			if (unity_LightAtten[k].x != -1 && unity_LightAtten[k].y != 1) // if spotlight
+			{
+				float rho = max (0, dot(toLight, unity_SpotDirection[k].xyz));
+				float spotAtt = (rho - unity_LightAtten[k].x) * unity_LightAtten[k].y;
+				atten *= saturate(spotAtt);
+			}
+			// half diff = max (0, dot (viewNormal, toLight));
+			// half3 light = unity_LightColor[k].rgb * atten;
+
+			// o.light[k] = atten * diff;
+			o.light[k] = atten;
+		}
+	#endif
+
 	UNITY_TRANSFER_SHADOW(o, o.uv);
 	UNITY_TRANSFER_FOG(o, o.pos);
 	return o;
@@ -239,7 +271,7 @@ v2f vert(appdata v)
 {
 	half3 additiveSoftLit = half3(0, 0, 0);
 	half3 additiveLit = half3(0, 0, 0);
-	#ifdef UNITY_PASS_FORWARDBASE
+	#if defined(UNITY_PASS_FORWARDBASE) || defined(KF_VERTEX)
 		half3 additiveEmit = half3(0, 0, 0);
 	#endif
 	half3 multiply = half3(1, 1, 1);
@@ -344,7 +376,7 @@ v2f vert(appdata v)
 	// Emission
 	#ifdef KF_EMISSION
 		half lightScale = _ScaleWithLightSensitivity;
-		#ifdef UNITY_PASS_FORWARDBASE
+		#if defined(UNITY_PASS_FORWARDBASE) || defined(KF_VERTEX)
 			additiveLit += emission * lightScale; // Emission affects lit texture
 			additiveEmit += emission * (1 - lightScale); // Emission glows
 		#else
@@ -363,10 +395,16 @@ v2f vert(appdata v)
 
 	// Lighting (Ambient and Colour)
 	half4 vertexLightAtten = half4(0, 0, 0, 0);
-	half3 ambient = ShadeSH9(half4(0, 0.5, 0, 1));
-	#if defined(VERTEXLIGHT_ON)
-		ambient += get4VertexLightsColFalloff(i.worldPos, i.normal, vertexLightAtten);
+
+	#ifdef KF_VERTEX
+		half3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
+	#else
+		half3 ambient = ShadeSH9(half4(0, 0.5, 0, 1));
+		#if defined(VERTEXLIGHT_ON)
+			ambient += get4VertexLightsColFalloff(i.worldPos, i.normal, vertexLightAtten);
+		#endif
 	#endif
+
 	ambient = lerp(dot(ambient, grayscaleVec), ambient, _LightingSaturation); // Desaturate ambient light
 	// ambient = min(ambient, _MaxBrightness); // Limit maximum ambient
 
@@ -382,56 +420,72 @@ v2f vert(appdata v)
 
 	half3 viewDir = normalize(_WorldSpaceCameraPos - i.worldPos);
 
-	half3 lightCol = half3(0, 0, 0);
-	calcLightCol(ambient, lightCol);
-
 	// Lighting (Attenuation and Shadows)
-	fixed shadow = UNITY_SHADOW_ATTENUATION(i, i.worldPos.xyz);
+	#ifdef KF_VERTEX
+		half3 lightCol = half3(0, 0, 0);
+		lightCol.rgb += unity_LightColor[0] * i.light.x;
+		lightCol.rgb += unity_LightColor[1] * i.light.y;
+		lightCol.rgb += unity_LightColor[2] * i.light.z;
+		lightCol.rgb += unity_LightColor[3] * i.light.w;
 
-	#ifdef POINT
-		unityShadowCoord3 lightCoord = mul(unity_WorldToLight, unityShadowCoord4(i.worldPos.xyz, 1)).xyz;
-		fixed attenuation = tex2D(_LightTexture0, dot(lightCoord, lightCoord).rr).r;
-		shadow = lerp(shadow, 1.0, 1 - _ShadowStrength);
-	#endif
+		half3 brightness = lightCol + ambient;
 
-	#ifdef SPOT
-		DECLARE_LIGHT_COORD(i, i.worldPos.xyz);
-		fixed attenuation = (lightCoord.z > 0) * UnitySpotCookie(lightCoord) * UnitySpotAttenuate(lightCoord.xyz);
-		shadow = lerp(shadow, 1.0, 1 - _ShadowStrength);
-	#endif
+	#else
+		half3 lightCol = half3(0, 0, 0);
+		calcLightCol(ambient, lightCol);
 
-	#ifdef POINT_COOKIE
-		DECLARE_LIGHT_COORD(i, i.worldPos.xyz);
-		fixed attenuation = tex2D(_LightTextureB0, dot(lightCoord, lightCoord).rr).r * texCUBE(_LightTexture0, lightCoord).w;
-		shadow = lerp(shadow, 1.0, 1 - _ShadowStrength);
-	#endif
+		fixed shadow = UNITY_SHADOW_ATTENUATION(i, i.worldPos.xyz);
 
-	#ifdef DIRECTIONAL_COOKIE
-		DECLARE_LIGHT_COORD(i, i.worldPos.xyz);
-		fixed attenuation = tex2D(_LightTexture0, lightCoord).w;
-		shadow = lerp(shadow, 1.0, 1 - _ShadowStrength);
-	#endif
+		#ifdef POINT
+			unityShadowCoord3 lightCoord = mul(unity_WorldToLight, unityShadowCoord4(i.worldPos.xyz, 1)).xyz;
+			half attenuation = tex2D(_LightTexture0, dot(lightCoord, lightCoord).rr).r;
+			shadow = lerp(shadow, 1.0, 1 - _ShadowStrength);
+		#endif
 
-	#ifdef DIRECTIONAL
-		fixed attenuation = 1.0;
-	#endif
+		#ifdef SPOT
+			DECLARE_LIGHT_COORD(i, i.worldPos.xyz);
+			half attenuation = (lightCoord.z > 0) * UnitySpotCookie(lightCoord) * UnitySpotAttenuate(lightCoord.xyz);
+			shadow = lerp(shadow, 1.0, 1 - _ShadowStrength);
+		#endif
 
-	#if defined(UNITY_PASS_FORWARDBASE) && !defined(DIRECTIONAL)
-		if (all(_LightColor0.rgb == 0.0)) {
-			attenuation = 1.0;
-		}
+		#ifdef POINT_COOKIE
+			DECLARE_LIGHT_COORD(i, i.worldPos.xyz);
+			half attenuation = tex2D(_LightTextureB0, dot(lightCoord, lightCoord).rr).r * texCUBE(_LightTexture0, lightCoord).w;
+			shadow = lerp(shadow, 1.0, 1 - _ShadowStrength);
+		#endif
+
+		#ifdef DIRECTIONAL_COOKIE
+			DECLARE_LIGHT_COORD(i, i.worldPos.xyz);
+			half attenuation = tex2D(_LightTexture0, lightCoord).w;
+			shadow = lerp(shadow, 1.0, 1 - _ShadowStrength);
+		#endif
+
+		#ifdef DIRECTIONAL
+			half attenuation = 1.0;
+		#endif
+
+		#if defined(UNITY_PASS_FORWARDBASE) && !defined(DIRECTIONAL)
+			if (all(_LightColor0.rgb == 0.0)) {
+				attenuation = 1.0;
+			}
+		#endif
+
+		attenuation = min(attenuation, _MaxBrightness);
+		half3 brightness = attenuation * lightCol + ambient;
 	#endif
 
 	// Lighting (Brightness level)
-	half3 brightness = min(attenuation, _MaxBrightness) * lightCol + ambient;
+	// half3 brightness = attenuation * lightCol + ambient;
 
-	#ifdef UNITY_PASS_FORWARDBASE
+	#if defined(UNITY_PASS_FORWARDBASE) || defined(KF_VERTEX)
 		brightness = max(brightness, _MinBrightness); // Limit minimum brightness
 	#endif
 	brightness = min(brightness, _MaxBrightness); // Limit maximum brightness
 
 	// Apply realtime shadows
-	brightness *= lerp(shadow, 1.0, (1 - _ShadowStrength) + (ambient * _ShadowLit));
+	#ifndef KF_VERTEX
+		brightness *= lerp(shadow, 1.0, (1 - _ShadowStrength) + (ambient * _ShadowLit));
+	#endif
 
 	// Shadow Ramp
 	#ifdef KF_SHADOW
@@ -532,7 +586,7 @@ v2f vert(appdata v)
 	col += additiveLit * multiply; // * log2(getBrightness(additiveLit) * 4.0 + 1.0) * 0.175;
 	// col *= multiply;
 	// col = min(col, 1.0);
-	#ifdef UNITY_PASS_FORWARDBASE
+	#if defined(UNITY_PASS_FORWARDBASE) || defined(KF_VERTEX)
 		col += additiveEmit;
 	#endif
 

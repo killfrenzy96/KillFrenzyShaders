@@ -28,6 +28,10 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 
 		featureEnabled = new KillFrenzyToonLitFeatures();
 
+		if (shader.name.Contains("Single Pass")) {
+			featureEnabled.singlePass = true;
+		}
+
 		if (shader.name.Contains("Cutout")) {
 			featureEnabled.cutout = true;
 		}
@@ -83,6 +87,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		DrawMain(materialEditor, ref featureShow.main);
 		if (featureEnabled.cutout) DrawCutout(materialEditor, ref featureShow.cutout);
 		if (featureEnabled.textureAlt) DrawTextureAlt(materialEditor, ref featureShow.textureAlt);
+		DrawLighting(materialEditor, ref featureShow.lighting);
 		if (featureEnabled.shadow) DrawShadow(materialEditor, ref featureShow.shadow);
 		if (featureEnabled.normal) DrawNormal(materialEditor, ref featureShow.normal);
 		if (featureEnabled.specular) DrawSpecular(materialEditor, ref featureShow.specular);
@@ -99,7 +104,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		if (featureEnabled.hsb) DrawHSB(materialEditor, ref featureShow.hsb);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.5");
+		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.6");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -118,15 +123,23 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		materialEditor.TexturePropertySingleLine(new GUIContent("Main Texture", "Main Albedo texture."), properties._MainTex, properties._Color);
 		materialEditor.TextureScaleOffsetProperty(properties._MainTex);
 
-		SeparatorThin();
+		DrawSpace();
+	}
+
+	private void DrawLighting(MaterialEditor materialEditor, ref bool show) {
+		ShurikenFoldout("Lighting", ref show);
+		if (!show) return;
+
 		materialEditor.ShaderProperty(properties._MinBrightness, new GUIContent("Minimum Brightness", "Lowest lighting brightness level allowed."));
 		materialEditor.ShaderProperty(properties._MaxBrightness, new GUIContent("Maximum Brightness", "Highest lighting brightness level allowed."));
 		materialEditor.ShaderProperty(properties._Contrast, new GUIContent("Contrast Adjustment", "Increases brightness difference between dark and bright colours."));
 		materialEditor.ShaderProperty(properties._LightingSaturation, new GUIContent("Lighting Saturation", "Lower values will convert coloured light sources to grayscale."));
 
-		SeparatorThin();
-		materialEditor.ShaderProperty(properties._ShadowStrength, new GUIContent("Recieved Shadow Strength", "Strength of recieved realtime shadows."));
-		materialEditor.ShaderProperty(properties._ShadowLit, new GUIContent("Received Shadow Ambient Tint", "How much realtime shadows is affected by ambient lighting. Low values will force realtime shadows to be rendered at full strength."));
+		if (!featureEnabled.singlePass) {
+			SeparatorThin();
+			materialEditor.ShaderProperty(properties._ShadowStrength, new GUIContent("Recieved Shadow Strength", "Strength of recieved realtime shadows."));
+			materialEditor.ShaderProperty(properties._ShadowLit, new GUIContent("Received Shadow Ambient Tint", "How much realtime shadows is affected by ambient lighting. Low values will force realtime shadows to be rendered at full strength."));
+		}
 
 		DrawSpace();
 	}
@@ -473,7 +486,9 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 
 public class KillFrenzyToonLitFeatures
 {
+	public bool singlePass = false;
 	public bool main = true;
+	public bool lighting = false;
 	public bool cutout = false;
 	public bool transparent = false;
 	public bool textureAlt = false;
