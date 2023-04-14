@@ -74,6 +74,7 @@
 		// [HDR]_OutlineColor("Outline Color", Color) = (0.5,0.5,0.5,1)
 		// [NoScaleOffset]_OutlineMask("Outline Mask", 2D) = "white" {}
 		// _OutlineWidth("Outline Width", Range(0, 2)) = 0.1
+		// _OutlineFade("Outline Fade", Range(0, 1)) = 1
 
 
 		[HDR]_MatcapTint("Reflection Tint", Color) = (1,1,1,1)

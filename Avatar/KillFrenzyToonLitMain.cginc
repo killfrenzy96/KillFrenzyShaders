@@ -107,6 +107,7 @@ fixed _VertexColorAlbedo;
 	sampler2D _OutlineMask;
 	fixed4 _OutlineColor;
 	fixed _OutlineWidth;
+	fixed _OutlineFade;
 #endif
 
 #ifdef KF_CUBEMAP
@@ -657,7 +658,7 @@ v2f vert(appdata v)
 				for (int j = 2; j >= 0; j--) {
 					IN[j].vertex.xyz += normalize(IN[j].normal) * outlineWidth[j];
 					IN[j].pos = UnityObjectToClipPos(IN[j].vertex.xyz);
-					IN[j].outlineColor = half4(lerp(1.0, _OutlineColor.rgb, outlineVisibility), outlineWidthMask[j]);
+					IN[j].outlineColor = half4(lerp(_OutlineColor.rgb, 1.0, (1.0 - outlineVisibility) * _OutlineFade), outlineWidthMask[j]);
 
 					triStream.Append(IN[j]);
 				}

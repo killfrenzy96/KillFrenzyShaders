@@ -104,7 +104,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		if (featureEnabled.hsb) DrawHSB(materialEditor, ref featureShow.hsb);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.6");
+		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.6c");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -296,6 +296,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		materialEditor.TexturePropertySingleLine(new GUIContent("Outline Mask", "Mask for outlines. White = Show outlines. Black = Hide outlines. Gray colours affect outline thickness."), properties._OutlineMask);
 		constrainedShaderProperty(materialEditor, properties._OutlineColor, new GUIContent("Outline Color", "Colour of outline. This is affected by the model's colour and lighting."));
 		materialEditor.ShaderProperty(properties._OutlineWidth, new GUIContent("Outline Width", "Thickness of outline. Higher numbers create a thicker outline."));
+		materialEditor.ShaderProperty(properties._OutlineFade, new GUIContent("Outline Colour Fade", "Fades the outline colour out with distance. This may not look correct on meshes with differently coloured backfaces."));
 
 		DrawSpace();
 	}
@@ -568,6 +569,7 @@ public class KillFrenzyToonLitMaterialProperties
 	public MaterialProperty _OutlineColor = null;
 	public MaterialProperty _OutlineMask = null;
 	public MaterialProperty _OutlineWidth = null;
+	public MaterialProperty _OutlineFade = null;
 
 	public MaterialProperty _MatcapTint = null;
 	public MaterialProperty _BakedCubemap = null;
