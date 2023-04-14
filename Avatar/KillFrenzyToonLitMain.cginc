@@ -637,7 +637,7 @@ v2f vert(appdata v)
 		[unroll]
 		for (int k = 0; k < 3; k++)
 		{
-			IN[k].outlineColor = 1.0;
+			IN[k].outlineColor = half4(1,1,1,-1);
 			triStream.Append(IN[k]);
 		}
 
