@@ -326,6 +326,7 @@ v2f vert(appdata v)
 		#endif
 		alpha *= (1.0 - _AlphaNoise * 0.5) + frac(frac(_Time.a * dot(i.uv, float2(12.9898, 78.233))) * 43758.5453123) * _AlphaNoise;
 		clip(alpha * (1 + _Cutoff) - _Cutoff);
+		alpha = clamp(alpha, 0, 1);
 	#endif
 
 	// Normal
