@@ -1,4 +1,8 @@
-﻿#include "UnityCG.cginc"
+﻿// Upgrade NOTE: commented out 'float4 unity_LightmapST', a built-in variable
+// Upgrade NOTE: commented out 'sampler2D unity_Lightmap', a built-in variable
+// Upgrade NOTE: replaced tex2D unity_Lightmap with UNITY_SAMPLE_TEX2D
+
+#include "UnityCG.cginc"
 #include "Lighting.cginc"
 #include "AutoLight.cginc"
 
@@ -146,12 +150,21 @@ fixed _VertexColorAlbedo;
 	float _RainbowEmissionHueSpeed;
 #endif
 
+#ifdef LIGHTMAP_ON
+	// sampler2D unity_Lightmap;
+	// float4 unity_LightmapST;
+#endif
+
+
 struct appdata
 {
 	float4 vertex: POSITION;
 	fixed4 color: COLOR;
 	half3 normal: NORMAL;
 	float2 uv: TEXCOORD0;
+	#ifdef LIGHTMAP_ON
+		float2 uv2: TEXCOORD1;
+	#endif
 	UNITY_VERTEX_INPUT_INSTANCE_ID
 	#ifdef KF_NORMAL
 		half4 tangent: TANGENT;
@@ -184,6 +197,9 @@ struct v2f
 	#ifdef KF_VERTEX
 		float4 light: TEXCOORD11;
 	#endif
+	#ifdef LIGHTMAP_ON
+		float2 lightmapUv: TEXCOORD12;
+	#endif
 	UNITY_VERTEX_OUTPUT_STEREO
 };
 
@@ -205,6 +221,10 @@ v2f vert(appdata v)
 	o.color = v.color;
 	o.normal = v.normal;
 	o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+
+	#ifdef LIGHTMAP_ON
+		o.lightmapUv = v.uv2 * unity_LightmapST.xy + unity_LightmapST.zw;
+	#endif
 
 	#ifdef KF_OUTLINE
 		half outlineWidthMask = tex2Dlod(_OutlineMask, float4(o.uv, 0, 0)).r;
@@ -432,6 +452,11 @@ v2f vert(appdata v)
 
 		half3 brightness = lightCol + ambient;
 
+	#elif LIGHTMAP_ON
+		half3 brightness = DecodeLightmap(UNITY_SAMPLE_TEX2D(unity_Lightmap, i.lightmapUv));
+		brightness = lerp(brightness, 0.0, 1 - _ShadowStrength);
+		brightness = brightness + (ambient * _ShadowLit);
+
 	#else
 		half3 lightCol = half3(0, 0, 0);
 		calcLightCol(ambient, lightCol);
@@ -485,7 +510,7 @@ v2f vert(appdata v)
 	brightness = min(brightness, _MaxBrightness); // Limit maximum brightness
 
 	// Apply realtime shadows
-	#ifndef KF_VERTEX
+	#if !defined(KF_VERTEX) && !defined(LIGHTMAP_ON)
 		brightness *= lerp(shadow, 1.0, (1 - _ShadowStrength) + (ambient * _ShadowLit));
 	#endif
 

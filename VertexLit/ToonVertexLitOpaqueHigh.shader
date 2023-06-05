@@ -12,6 +12,7 @@
 		_MinBrightness("Minimum Brightness", Range(0,1)) = 0.01
 		_MaxBrightness("Maximum Brightness", Range(0,2)) = 1.0
 		_Contrast("Contrast Adjustment", Range(0,1)) = 0.0
+		_ShadowStrength("Lightmap Shadow Strength", Range(0,1)) = 1.0
 
 
 		// _Cutoff("Cutoff Alpha", Range(0,1)) = 0.5
@@ -76,6 +77,34 @@
 			#pragma target 2.0
 			#pragma vertex vert
 			#pragma fragment frag
+
+			// #define KF_CUTOUT
+			// #define KF_TRANSPARENT
+			#define KF_SHADOW
+			#define KF_EMISSION
+			// #define KF_SPECULAR
+			#define KF_RIMLIGHT
+			#define KF_RIMSHADOW
+			// #define KF_MATCAP
+
+			#include "KillFrenzyToonVertexLitMain.cginc"
+
+			ENDCG
+		}
+
+		Pass {
+			Name "VERTEXLM"
+			Tags { "LightMode" = "VertexLM" }
+			Lighting On
+
+			CGPROGRAM
+			#pragma target 2.0
+			#pragma vertex vert
+			#pragma fragment frag
+
+			#ifndef LIGHTMAP_ON
+				#define LIGHTMAP_ON
+			#endif
 
 			// #define KF_CUTOUT
 			// #define KF_TRANSPARENT

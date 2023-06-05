@@ -62,6 +62,7 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 
 		DrawMain(materialEditor, ref featureShow.main);
 		if (featureEnabled.cutout) DrawCutout(materialEditor, ref featureShow.cutout);
+		DrawLighting(materialEditor, ref featureShow.lighting);
 		if (featureEnabled.shadow) DrawShadow(materialEditor, ref featureShow.shadow);
 		if (featureEnabled.specular) DrawSpecular(materialEditor, ref featureShow.specular);
 		if (featureEnabled.emission) DrawEmission(materialEditor, ref featureShow.emission);
@@ -70,7 +71,7 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 		if (featureEnabled.matCap) DrawMatCap(materialEditor, ref featureShow.matCap);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Avatar Toon VertexLit Shaders v0.9.6c");
+		DrawLabel("KillFrenzy's Avatar Toon VertexLit Shaders v0.9.7");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -89,10 +90,19 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 		materialEditor.TexturePropertySingleLine(new GUIContent("Main Texture", "Main Albedo texture."), properties._MainTex, properties._Color);
 		materialEditor.TextureScaleOffsetProperty(properties._MainTex);
 
-		SeparatorThin();
+		DrawSpace();
+	}
+
+	private void DrawLighting(MaterialEditor materialEditor, ref bool show) {
+		ShurikenFoldout("Lighting", ref show);
+		if (!show) return;
+
 		materialEditor.ShaderProperty(properties._MinBrightness, new GUIContent("Minimum Brightness", "Lowest lighting brightness level allowed."));
 		materialEditor.ShaderProperty(properties._MaxBrightness, new GUIContent("Maximum Brightness", "Highest lighting brightness level allowed."));
 		materialEditor.ShaderProperty(properties._Contrast, new GUIContent("Contrast Adjustment", "Increases brightness difference between dark and bright colours."));
+
+		SeparatorThin();
+		materialEditor.ShaderProperty(properties._ShadowStrength, new GUIContent("Lightmap Strength", "Strength of lightmap shadows."));
 
 		DrawSpace();
 	}
@@ -315,6 +325,7 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 public class KillFrenzyToonVertexLitFeatures
 {
 	public bool main = true;
+	public bool lighting = false;
 	public bool cutout = false;
 	public bool transparent = false;
 	public bool shadow = false;
@@ -338,6 +349,7 @@ public class KillFrenzyToonVertexLitMaterialProperties
 	public MaterialProperty _MinBrightness = null;
 	public MaterialProperty _MaxBrightness = null;
 	public MaterialProperty _Contrast = null;
+	public MaterialProperty _ShadowStrength = null;
 
 	public MaterialProperty _Cutoff = null;
 

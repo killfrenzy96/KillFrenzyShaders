@@ -5,29 +5,6 @@
 // #define KF_RIMLIGHT
 // #define KF_RIMSHADOW
 
-struct appdata
-{
-	float4 vertex: POSITION;
-	fixed4 color: COLOR;
-	half3 normal: NORMAL;
-	float2 uv: TEXCOORD0;
-	UNITY_VERTEX_INPUT_INSTANCE_ID
-};
-
-struct v2f
-{
-	float4 pos: SV_POSITION;
-	fixed4 light: COLOR0;
-	#ifdef KF_SHADOW
-		float3 uvShadow: TEXCOORD0;
-	#else
-		float2 uvShadow: TEXCOORD0;
-	#endif
-	#ifdef KF_MATCAP
-		half2 matcapUV: TEXCOORD1;
-	#endif
-	UNITY_VERTEX_OUTPUT_STEREO
-};
 
 fixed4 _Color;
 UNITY_DECLARE_TEX2D(_MainTex);
@@ -81,6 +58,43 @@ fixed _VertexColorAlbedo;
 	fixed _MatcapTintToDiffuse;
 #endif
 
+#ifdef LIGHTMAP_ON
+	// sampler2D unity_Lightmap;
+	// float4 unity_LightmapST;
+	fixed _ShadowStrength;
+#endif
+
+
+struct appdata
+{
+	float4 vertex: POSITION;
+	fixed4 color: COLOR;
+	half3 normal: NORMAL;
+	float2 uv: TEXCOORD0;
+	#ifdef LIGHTMAP_ON
+		float2 uv2: TEXCOORD1;
+	#endif
+	UNITY_VERTEX_INPUT_INSTANCE_ID
+};
+
+struct v2f
+{
+	float4 pos: SV_POSITION;
+	fixed4 light: COLOR0;
+	#ifdef KF_SHADOW
+		float3 uvShadow: TEXCOORD0;
+	#else
+		float2 uvShadow: TEXCOORD0;
+	#endif
+	#ifdef KF_MATCAP
+		half2 matcapUV: TEXCOORD1;
+	#endif
+	#ifdef LIGHTMAP_ON
+		float2 lightmapUv: TEXCOORD2;
+	#endif
+	UNITY_VERTEX_OUTPUT_STEREO
+};
+
 #include "KillFrenzyToonVertexLitHelper.cginc"
 
 v2f vert(appdata v)
@@ -89,8 +103,8 @@ v2f vert(appdata v)
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-	o.uvShadow.xy = TRANSFORM_TEX(v.uv, _MainTex);
 	o.pos = UnityObjectToClipPos(v.vertex);
+	o.uvShadow.xy = TRANSFORM_TEX(v.uv, _MainTex);
 
 	half3 viewpos = UnityObjectToViewPos (v.vertex.xyz);
 	half3 viewN = normalize (mul ((float3x3)UNITY_MATRIX_IT_MV, v.normal));
@@ -101,35 +115,40 @@ v2f vert(appdata v)
 		half shadow = 0;
 	#endif
 
-	for (int i = 0; i < 4; i++) {
-		half3 toLight = unity_LightPosition[i].xyz - viewpos.xyz * unity_LightPosition[i].w;
-		half lengthSq = dot(toLight, toLight);
+	#ifdef LIGHTMAP_ON
+		o.lightmapUv = v.uv2 * unity_LightmapST.xy + unity_LightmapST.zw;
+		o.light = 1.0;
+	#else
+		for (int i = 0; i < 4; i++) {
+			half3 toLight = unity_LightPosition[i].xyz - viewpos.xyz * unity_LightPosition[i].w;
+			half lengthSq = dot(toLight, toLight);
 
-		// don't produce NaNs if some vertex position overlaps with the light
-		lengthSq = max(lengthSq, 0.000001);
+			// don't produce NaNs if some vertex position overlaps with the light
+			lengthSq = max(lengthSq, 0.000001);
 
-		toLight *= rsqrt(lengthSq);
+			toLight *= rsqrt(lengthSq);
 
-		half atten = 1.0 / (1.0 + lengthSq * unity_LightAtten[i].z);
-		if (unity_LightAtten[i].x != -1 && unity_LightAtten[i].y != 1) // if spotlight
-		{
-			float rho = max (0, dot(toLight, unity_SpotDirection[i].xyz));
-			float spotAtt = (rho - unity_LightAtten[i].x) * unity_LightAtten[i].y;
-			atten *= saturate(spotAtt);
+			half atten = 1.0 / (1.0 + lengthSq * unity_LightAtten[i].z);
+			if (unity_LightAtten[i].x != -1 && unity_LightAtten[i].y != 1) // if spotlight
+			{
+				float rho = max (0, dot(toLight, unity_SpotDirection[i].xyz));
+				float spotAtt = (rho - unity_LightAtten[i].x) * unity_LightAtten[i].y;
+				atten *= saturate(spotAtt);
+			}
+			half3 light = unity_LightColor[i].rgb * atten;
+
+			lightColor += light;
+
+			#ifdef KF_SHADOW
+				half diff = max (0, dot (viewN, toLight));
+				half brightness = (light.r + light.g + light.b) * atten;
+				shadow += diff * brightness;
+				lightSources = max(lightSources, brightness);
+			#endif
 		}
-		half3 light = unity_LightColor[i].rgb * atten;
 
-		lightColor += light;
-
-		#ifdef KF_SHADOW
-			half diff = max (0, dot (viewN, toLight));
-			half brightness = (light.r + light.g + light.b) * atten;
-			shadow += diff * brightness;
-			lightSources = max(lightSources, brightness);
-		#endif
-	}
-
-	o.light = fixed4(clamp(lightColor, _MinBrightness, _MaxBrightness), 1.0);
+		o.light = fixed4(clamp(lightColor, _MinBrightness, _MaxBrightness), 1.0);
+	#endif
 
 	#if defined(KF_RIMLIGHT) || defined(KF_RIMSHADOW) || defined(KF_SPECULAR) || defined(KF_MATCAP)
 		#define KF_LIGHTING_EFFECTS
@@ -236,6 +255,13 @@ half4 frag(v2f i) : SV_Target
 	// Lighting
 	i.light = lerp(i.light, col * i.light * 2, _Contrast); // Contrast adjustment
 	col *= i.light;
+
+	// Lightmap
+	#ifdef LIGHTMAP_ON
+		half3 brightness = DecodeLightmap(UNITY_SAMPLE_TEX2D(unity_Lightmap, i.lightmapUv));
+		brightness = lerp(brightness, 1.0, 1 - _ShadowStrength);
+		col.rgb *= brightness;
+	#endif
 
 	// Cutout
 	#ifdef KF_CUTOUT
