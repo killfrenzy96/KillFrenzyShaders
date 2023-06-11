@@ -172,7 +172,7 @@
 		{
 			Name "FORWARDADD"
 			Tags { "LightMode" = "ForwardAdd" }
-			Blend OneMinusDstColor One, SrcAlpha One
+			Blend OneMinusDstColor One
 			BlendOp Max
 
 			CGPROGRAM

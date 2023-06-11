@@ -624,6 +624,11 @@ v2f vert(appdata v)
 		col *= i.outlineColor.rgb;
 	#endif
 
+	// Transparent blending
+	#if defined(KF_TRANSPARENT) && defined(UNITY_PASS_FORWARDADD)
+		col.rgb *= alpha;
+	#endif
+
 	// Fog
 	UNITY_APPLY_FOG(i.fogCoord, col);
 	return fixed4(col, alpha);
