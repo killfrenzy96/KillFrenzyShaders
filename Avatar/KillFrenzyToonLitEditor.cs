@@ -104,7 +104,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		if (featureEnabled.hsb) DrawHSB(materialEditor, ref featureShow.hsb);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.7");
+		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.7b");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -306,6 +306,9 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		if (!show) return;
 
 		DrawLabel("Reflections make the model look shiny. Unlike specular, a texture is provided to give the shine some detail.");
+
+		SeparatorThin();
+		constrainedShaderProperty(materialEditor, properties._WorldReflectionTint, new GUIContent("World Reflection Tint", "Colour and intensity of world reflection probes."));
 
 		SeparatorThin();
 		constrainedShaderProperty(materialEditor, properties._MatcapTint, new GUIContent("Reflection Tint", "Colour and intensity of the reflection."));
@@ -571,6 +574,7 @@ public class KillFrenzyToonLitMaterialProperties
 	public MaterialProperty _OutlineWidth = null;
 	public MaterialProperty _OutlineFade = null;
 
+	public MaterialProperty _WorldReflectionTint = null;
 	public MaterialProperty _MatcapTint = null;
 	public MaterialProperty _BakedCubemap = null;
 	public MaterialProperty _Matcap = null;

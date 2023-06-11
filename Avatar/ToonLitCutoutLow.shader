@@ -77,6 +77,7 @@
 		// _OutlineFade("Outline Fade", Range(0, 1)) = 1
 
 
+		// [HDR]_WorldReflectionTint("World Reflection Tint", Color) = (0,0,0,0)
 		// [HDR]_MatcapTint("Reflection Tint", Color) = (1,1,1,1)
 		// [NoScaleOffset]_BakedCubemap("Cubemap Reflection", CUBE) = "black" {}
 		// [NoScaleOffset]_Matcap("Matcap Reflection", 2D) = "black" {}

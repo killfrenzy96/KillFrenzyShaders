@@ -115,6 +115,7 @@ fixed _VertexColorAlbedo;
 #endif
 
 #ifdef KF_CUBEMAP
+	half4 _WorldReflectionTint;
 	samplerCUBE _BakedCubemap;
 #endif
 
@@ -540,6 +541,7 @@ v2f vert(appdata v)
 
 		half3 reflView = reflect(-viewDir, i.worldNormal);
 		half3 cubeMap = texCUBElod(_BakedCubemap, half4(reflView, roughness)) * _MatcapTint;
+		cubeMap += UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, reflView, roughness) * _WorldReflectionTint;
 		#ifndef KF_MATCAP
 			cubeMap *= lerp(1, col * 2, _MatcapTintToDiffuse * reflectivityMask.g);
 			cubeMap *= reflectivityMask.r;
