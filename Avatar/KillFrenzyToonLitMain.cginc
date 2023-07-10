@@ -156,6 +156,10 @@ fixed _VertexColorAlbedo;
 	// float4 unity_LightmapST;
 #endif
 
+#ifdef KF_INSERT_DECLARE
+	KF_INSERT_DECLARE
+#endif
+
 
 struct appdata
 {
@@ -169,6 +173,9 @@ struct appdata
 	UNITY_VERTEX_INPUT_INSTANCE_ID
 	#ifdef KF_NORMAL
 		half4 tangent: TANGENT;
+	#endif
+	#ifdef KF_INSERT_VERT_INPUT
+		KF_INSERT_VERT_INPUT
 	#endif
 };
 
@@ -201,16 +208,27 @@ struct v2f
 	#ifdef LIGHTMAP_ON
 		float2 lightmapUv: TEXCOORD12;
 	#endif
+	#ifdef KF_INSERT_FRAG_INPUT
+		KF_INSERT_FRAG_INPUT
+	#endif
 	UNITY_VERTEX_OUTPUT_STEREO
 };
 
 #include "KillFrenzyToonLitHelper.cginc"
+
+#ifdef KF_INSERT_FUNCTION
+	KF_INSERT_FUNCTION
+#endif
 
 v2f vert(appdata v)
 {
 	v2f o;
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
+
+	#ifdef KF_INSERT_VERT_START
+		KF_INSERT_VERT_START
+	#endif
 
 	#ifdef KF_GEOMETRY
 		o.vertex = v.vertex;
@@ -280,6 +298,10 @@ v2f vert(appdata v)
 		}
 	#endif
 
+	#ifdef KF_INSERT_VERT_END
+		KF_INSERT_VERT_END
+	#endif
+
 	UNITY_TRANSFER_SHADOW(o, o.uv);
 	UNITY_TRANSFER_FOG(o, o.pos);
 	return o;
@@ -298,23 +320,23 @@ v2f vert(appdata v)
 	#endif
 	half3 multiply = half3(1, 1, 1);
 
+	#ifdef KF_INSERT_FRAG_START
+		KF_INSERT_FRAG_START
+	#endif
+
 	// Main colour
-	half4 albedo = UNITY_SAMPLE_TEX2D(_MainTex, i.uv) * _Color;
+	half4 col = UNITY_SAMPLE_TEX2D(_MainTex, i.uv) * _Color;
 
 	// Alt colour
 	#ifdef KF_TEXTUREALT
-		albedo = lerp(albedo, UNITY_SAMPLE_TEX2D_SAMPLER(_AltTex, _MainTex, i.uv) * _AltColor, _AltTexStrength);
+		col = lerp(col, UNITY_SAMPLE_TEX2D_SAMPLER(_AltTex, _MainTex, i.uv) * _AltColor, _AltTexStrength);
 	#endif
 
-	half3 col = albedo.rgb;
-	half alpha = albedo.a;
-
 	// Vertex colour
-	col *= lerp(1, i.color.rgb, _VertexColorAlbedo);
-	alpha *= lerp(1, i.color.a, _VertexColorAlbedo);
+	col.rgba *= lerp(1, i.color.rgba, _VertexColorAlbedo);
 
 	#ifdef KF_TRANSPARENT
-		alpha *= lerp(1, i.color.r, _VertexColorAlpha);
+		col.a *= lerp(1, i.color.r, _VertexColorAlpha);
 	#endif
 
 	// Backface calculations
@@ -326,7 +348,7 @@ v2f vert(appdata v)
 				// Using discard is very slow, only use for cutout variant (which already uses clip).
 				// Allows outlines to be used with culling off.
 				if (i.outlineColor.a > 0.01) {
-					alpha -= 1.0;
+					col.a -= 1.0;
 				}
 			#endif
 
@@ -341,13 +363,13 @@ v2f vert(appdata v)
 
 	// Cutout
 	#ifdef KF_CUTOUT
-		// alpha *= 1 + CalcMipLevel(i.uv * _MainTex_TexelSize.zw) * 0.25;
+		// col.a *= 1 + CalcMipLevel(i.uv * _MainTex_TexelSize.zw) * 0.25;
 		#ifndef KF_TRANSPARENT
-			alpha = lerp(alpha, (alpha - _Cutoff) / max(fwidth(alpha), 0.0001) + 0.5, _AlphaToMaskSharpen);
+			col.a = lerp(col.a, (col.a - _Cutoff) / max(fwidth(col.a), 0.0001) + 0.5, _AlphaToMaskSharpen);
 		#endif
-		alpha *= (1.0 - _AlphaNoise * 0.5) + frac(frac(_Time.a * dot(i.uv, float2(12.9898, 78.233))) * 43758.5453123) * _AlphaNoise;
-		clip(alpha * (1 + _Cutoff) - _Cutoff);
-		alpha = clamp(alpha, 0, 1);
+		col.a *= (1.0 - _AlphaNoise * 0.5) + frac(frac(_Time.a * dot(i.uv, float2(12.9898, 78.233))) * 43758.5453123) * _AlphaNoise;
+		clip(col.a * (1 + _Cutoff) - _Cutoff);
+		col.a = clamp(col.a, 0, 1);
 	#endif
 
 	// Normal
@@ -383,10 +405,10 @@ v2f vert(appdata v)
 		half4 hslaMask = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMask, _MainTex, i.uv);
 		half4 hslaMaskEmission = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskEmission, _MainTex, i.uv);
 
-		// col = hue(col, half4(_HSLAAdjust.x, 0.0, _HSLAAdjust.zw), hslaMask.rgb); // Main Hue/Brightness
-		col = lerp(col, applyHue(col, _RainbowMainHueUVX * i.uv.x + _RainbowMainHueUVY * i.uv.y + _RainbowMainHueSpeed * _Time.y + _MainHue), hslaMask.r); // Main Hue
-		col = lerp(dot(col, grayscaleVec), col, (_MainSaturation * hslaMask.g) + 1.0); // Main Saturation
-		col *= 1.0 + _MainBrightness * hslaMask.b; // Main Brightness
+		// col.rgb = hue(col, half4(_HSLAAdjust.x, 0.0, _HSLAAdjust.zw), hslaMask.rgb); // Main Hue/Brightness
+		col.rgb = lerp(col.rgb, applyHue(col.rgb, _RainbowMainHueUVX * i.uv.x + _RainbowMainHueUVY * i.uv.y + _RainbowMainHueSpeed * _Time.y + _MainHue), hslaMask.r); // Main Hue
+		col.rgb = lerp(dot(col.rgb, grayscaleVec), col.rgb, (_MainSaturation * hslaMask.g) + 1.0); // Main Saturation
+		col.rgb *= 1.0 + _MainBrightness * hslaMask.b; // Main Brightness
 
 		#ifdef KF_EMISSION
 			// emission = hue(emission, half4(_HSLAAdjustEmission.x, 0.0, _HSLAAdjustEmission.zw), hslaMaskEmission); // Emission Hue/Brightness
@@ -405,15 +427,15 @@ v2f vert(appdata v)
 		#else
 			additiveLit += emission;
 		#endif
-		col += emission; // Emission always affects main texture
+		col.rgb += emission; // Emission always affects main texture
 	#endif
 
 	// Clamp base colour brightness and move it to additive lit
-	half colBrightness = getBrightness(col);
+	half colBrightness = getBrightness(col.rgb);
 	if (colBrightness > 1.0) {
-		half3 extraCol = col;
-		col *= 1.0 / colBrightness;
-		additiveLit += extraCol - col;
+		half3 extraCol = col.rgb;
+		col.rgb *= 1.0 / colBrightness;
+		additiveLit += extraCol - col.rgb;
 	}
 
 	// Lighting (Ambient and Colour)
@@ -525,7 +547,7 @@ v2f vert(appdata v)
 	#endif
 
 	// Lighting Part 3
-	brightness = lerp(brightness, col * brightness * 2, _Contrast); // Contrast adjustment
+	brightness = lerp(brightness, col.rgb * brightness * 2, _Contrast); // Contrast adjustment
 	multiply *= smoothMin(brightness, _MaxBrightness);
 
 	// Cubemap / Matcap Part 1
@@ -543,7 +565,7 @@ v2f vert(appdata v)
 		half3 cubeMap = texCUBElod(_BakedCubemap, half4(reflView, roughness)) * _MatcapTint;
 		cubeMap += UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, reflView, roughness) * _WorldReflectionTint;
 		#ifndef KF_MATCAP
-			cubeMap *= lerp(1, col * 2, _MatcapTintToDiffuse * reflectivityMask.g);
+			cubeMap *= lerp(1, col.rgb * 2, _MatcapTintToDiffuse * reflectivityMask.g);
 			cubeMap *= reflectivityMask.r;
 			additiveSoftLit += cubeMap;
 		#endif
@@ -558,7 +580,7 @@ v2f vert(appdata v)
 
 		half3 matCap = tex2Dlod(_Matcap, half4(remapUV, 0, (1 - _MatcapArea * reflectivityMask.b) * 7.0)) * _MatcapTint;
 		#ifndef KF_CUBEMAP
-			matCap *= lerp(1, col * 2, _MatcapTintToDiffuse * reflectivityMask.g);
+			matCap *= lerp(1, col.rgb * 2, _MatcapTintToDiffuse * reflectivityMask.g);
 			matCap *= reflectivityMask.r;
 			additiveSoftLit += matCap;
 		#endif
@@ -567,7 +589,7 @@ v2f vert(appdata v)
 	// Cubemap / Matcap Part 2
 	#if defined(KF_CUBEMAP) && defined(KF_MATCAP)
 		matCap += cubeMap;
-		matCap *= lerp(1, col * 2, _MatcapTintToDiffuse * reflectivityMask.g);
+		matCap *= lerp(1, col.rgb * 2, _MatcapTintToDiffuse * reflectivityMask.g);
 		matCap *= reflectivityMask.r;
 		additiveSoftLit += matCap;
 	#endif
@@ -588,14 +610,14 @@ v2f vert(appdata v)
 		smoothness *= 192;
 		half reflectionUntouched = min(exp2(smoothness * dotRdv - smoothness), 1.0); // Optimized estimation
 		half specular = smoothstep(max(_SpecularArea - _SpecularSharpness, 0.0), min(_SpecularArea + _SpecularSharpness, 1.0), reflectionUntouched) * specularIntensity;
-		additiveSoftLit += lerp(specular, col * specular, _SpecularAlbedoTint * specularMap.g); // Should specular highlight be tinted based on the albedo of the object?
+		additiveSoftLit += lerp(specular, col.rgb * specular, _SpecularAlbedoTint * specularMap.g); // Should specular highlight be tinted based on the albedo of the object?
 	#endif
 
 	// Rim light
 	#ifdef KF_RIMLIGHT
 		half rimIntensity = dotSvdn2 * max(dotNdl, 0);
 		rimIntensity = smoothstep(_RimRange - _RimSharpness, _RimRange + _RimSharpness, rimIntensity);
-		additiveSoftLit += rimIntensity * lerp(1.0, col, _RimAlbedoTint) * _RimIntensity * _RimColor;
+		additiveSoftLit += rimIntensity * lerp(1.0, col.rgb, _RimAlbedoTint) * _RimIntensity * _RimColor;
 	#endif
 
 	// Rim shadow
@@ -606,32 +628,40 @@ v2f vert(appdata v)
 		multiply *= shadowRim;
 	#endif
 
+	#ifdef KF_INSERT_FRAG_MID
+		KF_INSERT_FRAG_MID
+	#endif
+
 	// Combine data
-	// col = lerp(col, 1.0, min(additiveSoftLit, 1.0));
+	// col.rgb = lerp(col.rgb, 1.0, min(additiveSoftLit, 1.0));
 	// smoothMin(additiveSoftLit, (_MaxBrightness * 0.5) / (multiply + 0.0001));
-	col += additiveSoftLit;
-	col *= multiply;
-	col = smoothMin(col, _MaxBrightness);
-	col += additiveLit * multiply; // * log2(getBrightness(additiveLit) * 4.0 + 1.0) * 0.175;
-	// col *= multiply;
-	// col = min(col, 1.0);
+	col.rgb += additiveSoftLit;
+	col.rgb *= multiply;
+	col.rgb = smoothMin(col.rgb, _MaxBrightness);
+	col.rgb += additiveLit * multiply; // * log2(getBrightness(additiveLit) * 4.0 + 1.0) * 0.175;
+	// col.rgb *= multiply;
+	// col.rgb = min(col.rgb, 1.0);
 	#if defined(UNITY_PASS_FORWARDBASE) || defined(KF_VERTEX)
-		col += additiveEmit;
+		col.rgb += additiveEmit;
 	#endif
 
 	// Outline colour
 	#ifdef KF_OUTLINE
-		col *= i.outlineColor.rgb;
+		col.rgb *= i.outlineColor.rgb;
 	#endif
 
 	// Transparent blending
 	#if defined(KF_TRANSPARENT) && defined(UNITY_PASS_FORWARDADD)
-		col.rgb *= alpha;
+		col.rgb *= col.a;
+	#endif
+
+	#ifdef KF_INSERT_FRAG_END
+		KF_INSERT_FRAG_END
 	#endif
 
 	// Fog
 	UNITY_APPLY_FOG(i.fogCoord, col);
-	return fixed4(col, alpha);
+	return col;
 }
 
 #ifdef KF_GEOMETRY
@@ -643,6 +673,10 @@ v2f vert(appdata v)
 	void geom(triangle v2f IN[3], inout TriangleStream<v2f> triStream)
 	{
 		// v2f o;
+
+		#ifdef KF_INSERT_GEOM_START
+			KF_INSERT_GEOM_START
+		#endif
 
 		// Outlines Part 1
 		#ifdef KF_OUTLINE
@@ -672,6 +706,9 @@ v2f vert(appdata v)
 		for (int k = 0; k < 3; k++)
 		{
 			IN[k].outlineColor = half4(1,1,1,-1);
+			#ifdef KF_INSERT_GEOM_LOOP
+				KF_INSERT_GEOM_LOOP
+			#endif
 			triStream.Append(IN[k]);
 		}
 
@@ -693,11 +730,18 @@ v2f vert(appdata v)
 					IN[j].pos = UnityObjectToClipPos(IN[j].vertex.xyz);
 					IN[j].outlineColor = half4(lerp(_OutlineColor.rgb, 1.0, (1.0 - outlineVisibility) * _OutlineFade), outlineWidthMask[j]);
 
+					#ifdef KF_INSERT_GEOM_OUTLINE_LOOP
+						KF_INSERT_GEOM_OUTLINE_LOOP
+					#endif
 					triStream.Append(IN[j]);
 				}
 
 				triStream.RestartStrip();
 			}
+		#endif
+
+		#ifdef KF_INSERT_GEOM_END
+			KF_INSERT_GEOM_END
 		#endif
 	}
 #endif

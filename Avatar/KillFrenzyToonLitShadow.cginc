@@ -51,6 +51,10 @@ v2f vert (appdata v)
 	UNITY_SETUP_INSTANCE_ID(v);
 	UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
+	#ifdef KF_INSERT_VERT_START
+		KF_INSERT_VERT_START
+	#endif
+
 	#ifdef KF_CUTOUT
 		o.color = v.color;
 	#endif
@@ -73,6 +77,10 @@ v2f vert (appdata v)
 		v.vertex.xyz += normalize(v.normal) * outlineWidth;
 	#endif
 
+	#ifdef KF_INSERT_VERT_END
+		KF_INSERT_VERT_END
+	#endif
+
 	TRANSFER_SHADOW_CASTER_NORMALOFFSET(o);
 
 	return o;
@@ -80,6 +88,10 @@ v2f vert (appdata v)
 
 fixed4 frag (v2f i) : SV_Target
 {
+	#ifdef KF_INSERT_FRAG_START
+		KF_INSERT_FRAG_START
+	#endif
+
 	#ifdef KF_CUTOUT
 		// Main alpha
 		fixed alpha = tex2D(_MainTex, i.uv).a;
@@ -92,5 +104,10 @@ fixed4 frag (v2f i) : SV_Target
 		alpha *= (1.0 - _AlphaNoise * 0.5) + frac(frac(_Time.a * dot(i.uv, float2(12.9898, 78.233))) * 43758.5453123) * _AlphaNoise;
 		clip(alpha * (1 + _Cutoff) - _Cutoff);
 	#endif
+
+	#ifdef KF_INSERT_FRAG_END
+		KF_INSERT_FRAG_END
+	#endif
+
 	SHADOW_CASTER_FRAGMENT(i);
 }

@@ -104,7 +104,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		if (featureEnabled.hsb) DrawHSB(materialEditor, ref featureShow.hsb);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.7c");
+		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.8");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -135,11 +135,9 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		materialEditor.ShaderProperty(properties._Contrast, new GUIContent("Contrast Adjustment", "Increases brightness difference between dark and bright colours."));
 		materialEditor.ShaderProperty(properties._LightingSaturation, new GUIContent("Lighting Saturation", "Lower values will convert coloured light sources to grayscale."));
 
-		if (!featureEnabled.singlePass) {
-			SeparatorThin();
-			materialEditor.ShaderProperty(properties._ShadowStrength, new GUIContent("Recieved Shadow Strength", "Strength of recieved realtime shadows."));
-			materialEditor.ShaderProperty(properties._ShadowLit, new GUIContent("Received Shadow Ambient Tint", "How much realtime shadows is affected by ambient lighting. Low values will force realtime shadows to be rendered at full strength."));
-		}
+		SeparatorThin();
+		materialEditor.ShaderProperty(properties._ShadowStrength, new GUIContent("Recieved Shadow Strength", "Strength of recieved realtime shadows."));
+		materialEditor.ShaderProperty(properties._ShadowLit, new GUIContent("Received Shadow Ambient Tint", "How much realtime shadows is affected by ambient lighting. Low values will force realtime shadows to be rendered at full strength."));
 
 		DrawSpace();
 	}

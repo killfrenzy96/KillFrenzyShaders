@@ -20,6 +20,8 @@
 		_MaxBrightness("Maximum Brightness", Range(0,2)) = 0.9
 		_Contrast("Contrast Adjustment", Range(0,1)) = 0.25
 		_LightingSaturation("Lighting Saturation", Range(0,1)) = 0.75
+		_ShadowStrength("Recieved Shadow Strength", Range(0,1)) = 0.3
+		_ShadowLit("Received Shadow Ambient Tint", Range(0,1)) = 0
 
 
 		[Enum(Off,0,On,1)] _AlphaMask ("Alpha To Mask", Int) = 1
