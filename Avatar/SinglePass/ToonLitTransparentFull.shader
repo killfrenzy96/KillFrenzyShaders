@@ -42,10 +42,6 @@
 		_DetailNormalMapScale("Detail Normal Scale", Range(-2,2)) = 1
 
 
-		_BumpMap("Normal Map", 2D) = "bump" {}
-		_BumpScale("Normal Scale", Range(-2,2)) = 1
-
-
 		[NoScaleOffset]_SpecularMap("Specular Map", 2D) = "white" {}
 		_SpecularAlbedoTint("Specular Albedo Tint", Range(0,1)) = 1
 		_SpecularIntensity("Specular Intensity", Float) = 0.2
