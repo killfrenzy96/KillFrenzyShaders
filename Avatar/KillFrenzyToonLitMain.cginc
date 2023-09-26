@@ -339,6 +339,10 @@ v2f vert(appdata v)
 		col.a *= lerp(1, i.color.r, _VertexColorAlpha);
 	#endif
 
+	#ifdef KF_INSERT_FRAG_EARLY
+		KF_INSERT_FRAG_EARLY
+	#endif
+
 	// Backface calculations
 	#if defined(KF_NORMAL) || (defined(KF_OUTLINE) && defined(KF_CUTOUT))
 		bool face = facing > 0; // True if on front face, False if on back face
