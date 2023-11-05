@@ -659,6 +659,10 @@ v2f vert(appdata v)
 		KF_INSERT_FRAG_END
 	#endif
 
+	#if !defined(KF_CUTOUT) && !defined(KF_TRANSPARENT)
+		col.a = 1;
+	#endif
+
 	// Fog
 	UNITY_APPLY_FOG(i.fogCoord, col);
 	return col;
