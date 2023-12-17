@@ -71,7 +71,7 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 		if (featureEnabled.matCap) DrawMatCap(materialEditor, ref featureShow.matCap);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Avatar Toon VertexLit Shaders v0.9.8c");
+		DrawLabel("KillFrenzy's Avatar Toon VertexLit Shaders v0.9.8d");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -211,7 +211,10 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 		SeparatorThin();
 		materialEditor.ShaderProperty(properties._Stencil, new GUIContent("Stencil ID [0-255]", "The ID of stencil to render to. This should be a whole number from 0 to 255."));
 		materialEditor.ShaderProperty(properties._StencilComp, new GUIContent("Stencil Comparison", "The ID of stencil to compare to. Usually you would use 'Always' when writing the stencil, and use 'Equal' when reading the stencil. Use 'Disabled' to ignore stencil operations."));
-		materialEditor.ShaderProperty(properties._StencilOp, new GUIContent("Stencil Operation", "Usually you want to use 'Replace' when writing the stencil. Use 'Keep' to avoid writing to the stencil."));
+		materialEditor.ShaderProperty(properties._StencilOp, new GUIContent("Stencil Operation", "Write to the stencil when passing both stencil and depth test. Usually you want to use 'Replace' when writing the stencil. Use 'Keep' to avoid writing to the stencil."));
+		materialEditor.ShaderProperty(properties._StencilFail, new GUIContent("Stencil Fail", "Write to the stencil when failing the stencil test . Usually you want to use 'Replace' when writing the stencil. Use 'Keep' to avoid writing to the stencil."));
+		materialEditor.ShaderProperty(properties._StencilZFail, new GUIContent("Stencil Operation", "Write to the stencil when passing the stencil test but failing depth test. Usually you want to use 'Replace' when writing the stencil. Use 'Keep' to avoid writing to the stencil."));
+
 
 		SeparatorThin();
 		materialEditor.ShaderProperty(properties._Offset, new GUIContent("Z Offset", "Depth offset, which moves vectors closer or further from the camera. Often used to avoid Z-fighting."));
@@ -378,6 +381,8 @@ public class KillFrenzyToonVertexLitMaterialProperties
 	public MaterialProperty _Stencil = null;
 	public MaterialProperty _StencilComp = null;
 	public MaterialProperty _StencilOp = null;
+	public MaterialProperty _StencilFail = null;
+	public MaterialProperty _StencilZFail = null;
 	public MaterialProperty _Offset = null;
 	public MaterialProperty _ZClip = null;
 }
