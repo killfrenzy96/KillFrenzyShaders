@@ -543,7 +543,7 @@ v2f vert(appdata v)
 	#endif
 
 	// Shadow Ramp
-	#if defined(KF_SHADOW) && !defined(LIGHTMAP_ON) && !defined(UNITY_PASS_FORWARDBASE)
+	#if defined(KF_SHADOW) && !defined(LIGHTMAP_ON)
 		half3 ramp = tex2D(_Ramp, half2((dotNdl * 0.5 + 0.5), 0.5)).rgb;
 		ramp = ramp * _RampStrength + (1.0 - _RampStrength);
 
