@@ -476,9 +476,14 @@ v2f vert(appdata v)
 		half3 brightness = lightCol + ambient;
 
 	#elif LIGHTMAP_ON
-		half3 brightness = DecodeLightmap(UNITY_SAMPLE_TEX2D(unity_Lightmap, i.lightmapUv));
-		brightness = lerp(brightness, 0.0, 1 - _ShadowStrength);
-		brightness = brightness + (ambient * _ShadowLit);
+		half3 lightCol = half3(0, 0, 0);
+		calcLightCol(ambient, lightCol);
+
+		half3 lightMap = DecodeLightmap(UNITY_SAMPLE_TEX2D(unity_Lightmap, i.lightmapUv));
+		lightMap = lerp(lightMap, 0.0, 1 - _ShadowStrength);
+		lightMap = lightMap + (ambient * _ShadowLit);
+
+		half3 brightness = lightCol + lightMap;
 
 	#else
 		half3 lightCol = half3(0, 0, 0);
