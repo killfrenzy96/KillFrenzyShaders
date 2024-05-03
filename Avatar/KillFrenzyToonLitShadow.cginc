@@ -45,6 +45,14 @@ struct v2f
 	fixed _OutlineWidth;
 #endif
 
+#ifdef KF_INSERT_DECLARE
+	KF_INSERT_DECLARE
+#endif
+
+#ifdef KF_INSERT_FUNCTION
+	KF_INSERT_FUNCTION
+#endif
+
 v2f vert (appdata v)
 {
 	v2f o;

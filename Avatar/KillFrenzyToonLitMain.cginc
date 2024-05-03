@@ -368,7 +368,7 @@ v2f vert(appdata v)
 			col.a = lerp(col.a, (col.a - _Cutoff) / max(fwidth(col.a), 0.0001) + 0.5, _AlphaToMaskSharpen);
 		#endif
 		col.a *= (1.0 - _AlphaNoise * 0.5) + frac(frac(_Time.a * dot(i.uv, float2(12.9898, 78.233))) * 43758.5453123) * _AlphaNoise;
-		clip(col.a * (1 + _Cutoff) - _Cutoff);
+		clip(col.a * (1 + _Cutoff * _AlphaToMaskSharpen) - _Cutoff);
 		col.a = clamp(col.a, 0, 1);
 	#endif
 
