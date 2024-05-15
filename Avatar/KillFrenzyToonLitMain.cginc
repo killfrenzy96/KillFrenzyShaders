@@ -47,9 +47,7 @@ fixed _VertexColorAlbedo;
 #ifdef KF_CUTOUT
 	fixed _Cutoff;
 	fixed _AlphaNoise;
-	#ifndef KF_TRANSPARENT
-		fixed _AlphaToMaskSharpen;
-	#endif
+	fixed _AlphaToMaskSharpen;
 	float4 _MainTex_TexelSize;
 #endif
 
