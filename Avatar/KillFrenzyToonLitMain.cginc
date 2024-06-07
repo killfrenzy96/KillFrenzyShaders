@@ -122,6 +122,7 @@ fixed _VertexColorAlbedo;
 	fixed4 _MatcapTint;
 	fixed _MatcapTintToDiffuse;
 	fixed _MatcapArea;
+	fixed _MatcapFrensel;
 #endif
 
 #ifdef KF_HSB
@@ -455,7 +456,7 @@ v2f vert(appdata v)
 	half3 lightDir = calcLightDir(i, vertexLightAtten);
 	half dotNdl = dot(i.worldNormal, lightDir);
 
-	#if defined(KF_RIMLIGHT) || defined(KF_RIMSHADOW)
+	#if defined(KF_RIMLIGHT) || defined(KF_RIMSHADOW) || defined(KF_CUBEMAP) || defined(KF_MATCAP)
 		half3 stereoViewDir = calcStereoViewDir(i.worldPos);
 		// half dotSvdn = abs(dot(stereoViewDir, i.worldNormal));
 		half dotSvdn2 = saturate(1 - abs(dot(stereoViewDir, i.worldNormal)));
@@ -570,6 +571,7 @@ v2f vert(appdata v)
 		#ifndef KF_MATCAP
 			cubeMap *= lerp(1, col.rgb * 2, _MatcapTintToDiffuse * reflectivityMask.g);
 			cubeMap *= reflectivityMask.r;
+			matCap *= lerp(1, dotSvdn2, _MatcapFrensel);
 			additiveSoftLit += cubeMap;
 		#endif
 	#endif
@@ -585,6 +587,7 @@ v2f vert(appdata v)
 		#ifndef KF_CUBEMAP
 			matCap *= lerp(1, col.rgb * 2, _MatcapTintToDiffuse * reflectivityMask.g);
 			matCap *= reflectivityMask.r;
+			matCap *= lerp(1, dotSvdn2, _MatcapFrensel);
 			additiveSoftLit += matCap;
 		#endif
 	#endif
@@ -594,6 +597,7 @@ v2f vert(appdata v)
 		matCap += cubeMap;
 		matCap *= lerp(1, col.rgb * 2, _MatcapTintToDiffuse * reflectivityMask.g);
 		matCap *= reflectivityMask.r;
+		matCap *= lerp(1, dotSvdn2, _MatcapFrensel);
 		additiveSoftLit += matCap;
 	#endif
 

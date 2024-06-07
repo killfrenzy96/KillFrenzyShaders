@@ -104,7 +104,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		if (featureEnabled.hsb) DrawHSB(materialEditor, ref featureShow.hsb);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.8f");
+		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.8g");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -315,6 +315,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		materialEditor.TexturePropertySingleLine(new GUIContent("Reflection Mask", "Mask for reflection. Red = Reflection Intensity. Green = Reflection Albedo Tint. Blue = Reflection Area."), properties._ReflectivityMask);
 		materialEditor.ShaderProperty(properties._MatcapTintToDiffuse, new GUIContent("Reflection Albedo Tint", "How much the main texture colour affects the reflection brightness."));
 		materialEditor.ShaderProperty(properties._MatcapArea, new GUIContent("Reflection Area", "Low values will blur the reflection. High values will focus the reflection."));
+		materialEditor.ShaderProperty(properties._MatcapFrensel, new GUIContent("Reflection Frensel", "Apply reflections only when looking at surfaces with steep angles."));
 
 		DrawSpace();
 	}
@@ -331,6 +332,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		materialEditor.TexturePropertySingleLine(new GUIContent("Reflection Mask", "Mask for reflection. Red = Reflection Intensity. Green = Reflection Albedo Tint. Blue = Reflection Area."), properties._ReflectivityMask);
 		materialEditor.ShaderProperty(properties._MatcapTintToDiffuse, new GUIContent("Reflection Albedo Tint", "How much the main texture colour affects the reflection brightness."));
 		materialEditor.ShaderProperty(properties._MatcapArea, new GUIContent("Reflection Area", "Low values will blur the reflection. High values will focus the reflection."));
+		materialEditor.ShaderProperty(properties._MatcapFrensel, new GUIContent("Reflection Frensel", "Apply reflections only when looking at surfaces with steep angles."));
 
 		DrawSpace();
 	}
@@ -579,6 +581,7 @@ public class KillFrenzyToonLitMaterialProperties
 	public MaterialProperty _MatcapTintToDiffuse = null;
 	public MaterialProperty _ReflectivityMask = null;
 	public MaterialProperty _MatcapArea = null;
+	public MaterialProperty _MatcapFrensel = null;
 
 	public MaterialProperty _HSLAMask = null;
 	public MaterialProperty _MainHue = null;
