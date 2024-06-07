@@ -84,7 +84,7 @@
 		_MatcapTintToDiffuse("Reflection Albedo Tint", Range(0,1)) = 1
 		[HDR][NoScaleOffset]_ReflectivityMask("Reflection Mask" , 2D) = "white" {}
 		_MatcapArea("Reflection Area", Range(0,1)) = 1
-		_MatcapFrensel("Reflection Frensel", Range(0,1)) = 0
+		_MatcapFresnel("Reflection Fresnel", Range(0,1)) = 0
 
 
 		[NoScaleOffset]_HSLAMask("HSB Mask Main", 2D) = "white" {}

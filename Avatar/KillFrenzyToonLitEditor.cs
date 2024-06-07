@@ -104,7 +104,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		if (featureEnabled.hsb) DrawHSB(materialEditor, ref featureShow.hsb);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.8g");
+		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.8h");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -312,10 +312,10 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		constrainedShaderProperty(materialEditor, properties._MatcapTint, new GUIContent("Reflection Tint", "Colour and intensity of the reflection."));
 		materialEditor.TexturePropertySingleLine(new GUIContent("Cubemap Reflection", "Cube map texture used for reflection."), properties._BakedCubemap);
 		materialEditor.TexturePropertySingleLine(new GUIContent("Matcap Reflection", "Texture used for reflection."), properties._Matcap);
-		materialEditor.TexturePropertySingleLine(new GUIContent("Reflection Mask", "Mask for reflection. Red = Reflection Intensity. Green = Reflection Albedo Tint. Blue = Reflection Area."), properties._ReflectivityMask);
+		materialEditor.TexturePropertySingleLine(new GUIContent("Reflection Mask", "Mask for reflection. Red = Reflection Intensity. Green = Reflection Albedo Tint. Blue = Reflection Area. Alpha = Fresnel."), properties._ReflectivityMask);
 		materialEditor.ShaderProperty(properties._MatcapTintToDiffuse, new GUIContent("Reflection Albedo Tint", "How much the main texture colour affects the reflection brightness."));
 		materialEditor.ShaderProperty(properties._MatcapArea, new GUIContent("Reflection Area", "Low values will blur the reflection. High values will focus the reflection."));
-		materialEditor.ShaderProperty(properties._MatcapFrensel, new GUIContent("Reflection Frensel", "Apply reflections only when looking at surfaces with steep angles."));
+		materialEditor.ShaderProperty(properties._MatcapFresnel, new GUIContent("Reflection Fresnel", "Apply reflections only when looking at surfaces with steep angles."));
 
 		DrawSpace();
 	}
@@ -329,10 +329,10 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		SeparatorThin();
 		// materialEditor.ShaderProperty(properties._MatcapTint, new GUIContent("Reflection Tint", "Colour and intensity of the matcap."));
 		materialEditor.TexturePropertySingleLine(new GUIContent("Matcap Reflection", "Texture used for reflection."), properties._Matcap, properties._MatcapTint);
-		materialEditor.TexturePropertySingleLine(new GUIContent("Reflection Mask", "Mask for reflection. Red = Reflection Intensity. Green = Reflection Albedo Tint. Blue = Reflection Area."), properties._ReflectivityMask);
+		materialEditor.TexturePropertySingleLine(new GUIContent("Reflection Mask", "Mask for reflection. Red = Reflection Intensity. Green = Reflection Albedo Tint. Blue = Reflection Area. Alpha = Fresnel."), properties._ReflectivityMask);
 		materialEditor.ShaderProperty(properties._MatcapTintToDiffuse, new GUIContent("Reflection Albedo Tint", "How much the main texture colour affects the reflection brightness."));
 		materialEditor.ShaderProperty(properties._MatcapArea, new GUIContent("Reflection Area", "Low values will blur the reflection. High values will focus the reflection."));
-		materialEditor.ShaderProperty(properties._MatcapFrensel, new GUIContent("Reflection Frensel", "Apply reflections only when looking at surfaces with steep angles."));
+		materialEditor.ShaderProperty(properties._MatcapFresnel, new GUIContent("Reflection Fresnel", "Apply reflections only when looking at surfaces with steep angles."));
 
 		DrawSpace();
 	}
@@ -581,7 +581,7 @@ public class KillFrenzyToonLitMaterialProperties
 	public MaterialProperty _MatcapTintToDiffuse = null;
 	public MaterialProperty _ReflectivityMask = null;
 	public MaterialProperty _MatcapArea = null;
-	public MaterialProperty _MatcapFrensel = null;
+	public MaterialProperty _MatcapFresnel = null;
 
 	public MaterialProperty _HSLAMask = null;
 	public MaterialProperty _MainHue = null;

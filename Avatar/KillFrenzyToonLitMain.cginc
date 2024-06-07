@@ -122,7 +122,7 @@ fixed _VertexColorAlbedo;
 	fixed4 _MatcapTint;
 	fixed _MatcapTintToDiffuse;
 	fixed _MatcapArea;
-	fixed _MatcapFrensel;
+	fixed _MatcapFresnel;
 #endif
 
 #ifdef KF_HSB
@@ -556,7 +556,7 @@ v2f vert(appdata v)
 
 	// Cubemap / Matcap Part 1
 	#if defined(KF_CUBEMAP) || defined(KF_MATCAP)
-		half3 reflectivityMask = UNITY_SAMPLE_TEX2D_SAMPLER(_ReflectivityMask, _MainTex, i.uv).rgb;
+		half4 reflectivityMask = UNITY_SAMPLE_TEX2D_SAMPLER(_ReflectivityMask, _MainTex, i.uv);
 	#endif
 
 	// Cubemap
@@ -571,7 +571,7 @@ v2f vert(appdata v)
 		#ifndef KF_MATCAP
 			cubeMap *= lerp(1, col.rgb * 2, _MatcapTintToDiffuse * reflectivityMask.g);
 			cubeMap *= reflectivityMask.r;
-			matCap *= lerp(1, dotSvdn2, _MatcapFrensel);
+			matCap *= lerp(1, dotSvdn2, _MatcapFresnel * reflectivityMask.a);
 			additiveSoftLit += cubeMap;
 		#endif
 	#endif
@@ -587,7 +587,7 @@ v2f vert(appdata v)
 		#ifndef KF_CUBEMAP
 			matCap *= lerp(1, col.rgb * 2, _MatcapTintToDiffuse * reflectivityMask.g);
 			matCap *= reflectivityMask.r;
-			matCap *= lerp(1, dotSvdn2, _MatcapFrensel);
+			matCap *= lerp(1, dotSvdn2, _MatcapFresnel * reflectivityMask.a);
 			additiveSoftLit += matCap;
 		#endif
 	#endif
@@ -597,7 +597,7 @@ v2f vert(appdata v)
 		matCap += cubeMap;
 		matCap *= lerp(1, col.rgb * 2, _MatcapTintToDiffuse * reflectivityMask.g);
 		matCap *= reflectivityMask.r;
-		matCap *= lerp(1, dotSvdn2, _MatcapFrensel);
+		matCap *= lerp(1, dotSvdn2, _MatcapFresnel * reflectivityMask.a);
 		additiveSoftLit += matCap;
 	#endif
 
