@@ -550,6 +550,10 @@ v2f vert(appdata v)
 		brightness *= (ramp * (1 - ambientRamp)) + ambientRamp;
 	#endif
 
+	#ifdef KF_INSERT_FRAG_LIGHTING
+		KF_INSERT_FRAG_LIGHTING
+	#endif
+
 	// Lighting Part 3
 	brightness = lerp(brightness, col.rgb * brightness * 2, _Contrast); // Contrast adjustment
 	multiply *= smoothMin(brightness, _MaxBrightness);
