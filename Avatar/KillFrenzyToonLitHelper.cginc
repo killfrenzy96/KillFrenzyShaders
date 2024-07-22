@@ -1,4 +1,8 @@
 
+#ifndef KF_HELPER
+	#define KF_HELPER
+#endif
+
 // #define grayscaleVec half3(0.2125, 0.7154, 0.0721)
 #define grayscaleVec half3(0.2125, 0.7154, 0.2125)
 
