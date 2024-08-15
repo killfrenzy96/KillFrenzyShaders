@@ -115,7 +115,9 @@ v2f vert(appdata v)
 		KF_INSERT_VERT_END
 	#endif
 
-	UNITY_TRANSFER_SHADOW(o, o.uv);
+	#ifdef SHADOW_COORDS
+		UNITY_TRANSFER_SHADOW(o, o.uv);
+	#endif
 	UNITY_TRANSFER_FOG(o, o.pos);
 	return o;
 }
