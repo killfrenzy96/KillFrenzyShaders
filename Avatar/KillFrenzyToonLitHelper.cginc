@@ -108,7 +108,7 @@ void calcLightCol(inout half3 indirectDiffuse, inout half3 lightColor)
 	bool lightEnv = any(_WorldSpaceLightPos0.xyz);
 	if(lightEnv) {
 		lightColor = _LightColor0.rgb;
-		lightColor = lerp(dot(lightColor, grayscaleVec), lightColor, _LightingSaturation); // Desaturate light colour
+		// lightColor = lerp(dot(lightColor, grayscaleVec), lightColor, _LightingSaturation); // Desaturate light colour
 		// indirectDiffuse = indirectDiffuse;
 	} else {
 		// ...Otherwise

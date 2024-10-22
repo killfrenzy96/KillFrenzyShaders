@@ -270,7 +270,7 @@ v2f vert(appdata v)
 		#endif
 	#endif
 
-	ambient = lerp(dot(ambient, grayscaleVec), ambient, _LightingSaturation); // Desaturate ambient light
+	// ambient = lerp(dot(ambient, grayscaleVec), ambient, _LightingSaturation); // Desaturate ambient light
 	// ambient = min(ambient, _MaxBrightness); // Limit maximum ambient
 
 	// Dot Products and general calculations
@@ -286,8 +286,9 @@ v2f vert(appdata v)
 	half3 viewDir = normalize(_WorldSpaceCameraPos - i.worldPos);
 
 	// Lighting (Attenuation and Shadows)
+	half3 lightCol = half3(0, 0, 0);
+
 	#ifdef KF_VERTEX
-		half3 lightCol = half3(0, 0, 0);
 		lightCol.rgb += unity_LightColor[0] * i.light.x;
 		lightCol.rgb += unity_LightColor[1] * i.light.y;
 		lightCol.rgb += unity_LightColor[2] * i.light.z;
@@ -296,7 +297,6 @@ v2f vert(appdata v)
 		half3 brightness = lightCol + ambient;
 
 	#elif LIGHTMAP_ON
-		half3 lightCol = half3(0, 0, 0);
 		calcLightCol(ambient, lightCol);
 
 		half3 lightMap = DecodeLightmap(UNITY_SAMPLE_TEX2D(unity_Lightmap, i.lightmapUv));
@@ -306,7 +306,6 @@ v2f vert(appdata v)
 		half3 brightness = lightCol + lightMap;
 
 	#else
-		half3 lightCol = half3(0, 0, 0);
 		calcLightCol(ambient, lightCol);
 
 		fixed shadow = UNITY_SHADOW_ATTENUATION(i, i.worldPos.xyz);
@@ -351,6 +350,7 @@ v2f vert(appdata v)
 
 	// Lighting (Brightness level)
 	// half3 brightness = attenuation * lightCol + ambient;
+	brightness = lerp(dot(brightness, grayscaleVec), brightness, _LightingSaturation); // Desaturate light colour
 
 	#if defined(UNITY_PASS_FORWARDBASE) || defined(KF_VERTEX)
 		brightness = max(brightness, _MinBrightness); // Limit minimum brightness
@@ -449,7 +449,7 @@ v2f vert(appdata v)
 	#ifdef KF_RIMLIGHT
 		half rimIntensity = dotSvdn2 * max(dotNdl, 0);
 		rimIntensity = smoothstep(_RimRange - _RimSharpness, _RimRange + _RimSharpness, rimIntensity);
-		additiveSoftLit += rimIntensity * lerp(1.0, col.rgb, _RimAlbedoTint) * _RimIntensity * _RimColor;
+		additiveSoftLit += rimIntensity * lerp(1.0, col.rgb, _RimAlbedoTint) * _RimIntensity * _RimColor * normalize(max(lightCol, 0.001));
 	#endif
 
 	// Rim shadow
