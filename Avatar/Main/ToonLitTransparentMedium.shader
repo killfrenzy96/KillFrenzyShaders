@@ -156,7 +156,7 @@
 			#define KF_SHADOW
 			// #define KF_NORMAL
 			#define KF_SPECULAR
-			// #define KF_EMISSION
+			#define KF_EMISSION
 			// #define KF_EMISSIONALT
 			#define KF_RIMLIGHT
 			#define KF_RIMSHADOW
@@ -194,7 +194,7 @@
 			#define KF_SHADOW
 			// #define KF_NORMAL
 			#define KF_SPECULAR
-			// #define KF_EMISSION
+			#define KF_EMISSION
 			// #define KF_EMISSIONALT
 			#define KF_RIMLIGHT
 			#define KF_RIMSHADOW
