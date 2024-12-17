@@ -104,7 +104,7 @@ fixed _VertexColorAlbedo;
 #endif
 
 #if defined(KF_CUBEMAP) || defined(KF_MATCAP)
-	fixed4 _MatcapTint;
+	half4 _MatcapTint;
 	fixed _MatcapTintToDiffuse;
 	fixed _MatcapArea;
 	fixed _MatcapFresnel;

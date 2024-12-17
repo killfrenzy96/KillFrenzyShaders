@@ -391,13 +391,15 @@ v2f vert(appdata v)
 		roughness *= UNITY_SPECCUBE_LOD_STEPS;
 
 		half3 reflView = reflect(-viewDir, i.worldNormal);
-		half3 cubeMap = texCUBElod(_BakedCubemap, half4(reflView, roughness)) * _MatcapTint;
-		cubeMap += UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, reflView, roughness) * _WorldReflectionTint;
+		half4 cubeMap = texCUBElod(_BakedCubemap, half4(reflView, roughness));
+		if (cubeMap.a < 0.51) cubeMap.rgb = 0;
+		cubeMap.rgb *= _MatcapTint;
+		cubeMap.rgb += UNITY_SAMPLE_TEXCUBE_LOD(unity_SpecCube0, reflView, roughness) * _WorldReflectionTint;
 		#ifndef KF_MATCAP
-			cubeMap *= lerp(1, col.rgb * 2, _MatcapTintToDiffuse * reflectivityMask.g);
-			cubeMap *= reflectivityMask.r;
+			cubeMap.rgb *= lerp(1, col.rgb * 2, _MatcapTintToDiffuse * reflectivityMask.g);
+			cubeMap.rgb *= reflectivityMask.r;
 			matCap *= lerp(1, dotSvdn2, _MatcapFresnel * reflectivityMask.a);
-			additiveSoftLit += cubeMap;
+			additiveSoftLit += cubeMap.rgb;
 		#endif
 	#endif
 
