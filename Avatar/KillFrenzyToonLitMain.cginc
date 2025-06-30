@@ -13,6 +13,8 @@
 // #define KF_MATCAP
 // #define KF_HSB
 
+#include "LightVolumes.cginc"
+
 #ifdef KF_OUTLINE
 	#define KF_GEOMETRY
 #endif
@@ -260,11 +262,16 @@ v2f vert(appdata v)
 
 	// Lighting (Ambient and Colour)
 	half4 vertexLightAtten = half4(0, 0, 0, 0);
+	half3 L0, L1r, L1g, L1b;
+	LightVolumeSH(i.worldPos, L0, L1r, L1g, L1b);
 
 	#ifdef KF_VERTEX
 		half3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
 	#else
-		half3 ambient = ShadeSH9(half4(0, 0.5, 0, 1));
+		// half3 ambient = ShadeSH9(half4(0, 0.5, 0, 1));
+		// LightVolumeSH(i.worldPos, L0, L1r, L1g, L1b);
+		half3 ambient = LightVolumeEvaluate(half4(0, 0.5, 0, 1), L0, L1r, L1g, L1b);
+
 		#if defined(VERTEXLIGHT_ON)
 			ambient += get4VertexLightsColFalloff(i.worldPos, i.normal, vertexLightAtten);
 		#endif
@@ -274,7 +281,8 @@ v2f vert(appdata v)
 	// ambient = min(ambient, _MaxBrightness); // Limit maximum ambient
 
 	// Dot Products and general calculations
-	half3 lightDir = calcLightDir(i, vertexLightAtten);
+	LightVolumeEvaluate(i.worldNormal, L0, L1r, L1g, L1b);
+	half3 lightDir = calcLightDir(i, vertexLightAtten, L0, L1r, L1g, L1b);
 	half dotNdl = dot(i.worldNormal, lightDir);
 
 	#if defined(KF_RIMLIGHT) || defined(KF_RIMSHADOW) || defined(KF_CUBEMAP) || defined(KF_MATCAP)
@@ -303,7 +311,10 @@ v2f vert(appdata v)
 		lightMap = lerp(lightMap, 0.0, 1 - _ShadowStrength);
 		lightMap = lightMap + (ambient * _ShadowLit);
 
-		half3 brightness = lightCol + lightMap;
+		LightVolumeAdditiveSH(i.worldPos, L0, L1r, L1g, L1b);
+		half3 lightVolume = LightVolumeEvaluate(i.worldNormal, L0, L1r, L1g, L1b);
+
+		half3 brightness = lightCol + lightMap + lightVolume;
 
 	#else
 		calcLightCol(ambient, lightCol);

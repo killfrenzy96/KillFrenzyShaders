@@ -28,11 +28,12 @@ half3 getVertexLightsDir(v2f i, half4 vertexLightAtten)
 }
 
 // Get the most intense light Dir from probes OR from a light source. Method developed by Xiexe / Merlin
-half3 calcLightDir(v2f i, half4 vertexLightAtten)
+half3 calcLightDir(v2f i, half4 vertexLightAtten, float3 L0, float3 L1r, float3 L1g, float3 L1b)
 {
 	half3 lightDir = UnityWorldSpaceLightDir(i.worldPos);
 
-	half3 probeLightDir = unity_SHAr.xyz + unity_SHAg.xyz + unity_SHAb.xyz;
+	// half3 probeLightDir = unity_SHAr.xyz + unity_SHAg.xyz + unity_SHAb.xyz;
+	half3 probeLightDir = L1r.xyz + L1g.xyz + L1b.xyz;
 	lightDir = (lightDir + probeLightDir); //Make light dir the average of the probe direction and the light source direction.
 
 	#if defined(VERTEXLIGHT_ON)
@@ -41,7 +42,8 @@ half3 calcLightDir(v2f i, half4 vertexLightAtten)
 	#endif
 
 	#if !defined(POINT) && !defined(SPOT) && !defined(VERTEXLIGHT_ON) // if the average length of the light probes is null, and we don't have a directional light in the scene, fall back to our fallback lightDir
-		if(length(unity_SHAr.xyz*unity_SHAr.w + unity_SHAg.xyz*unity_SHAg.w + unity_SHAb.xyz*unity_SHAb.w) == 0 && length(lightDir) < 0.1)
+		// if(length(unity_SHAr.xyz*unity_SHAr.w + unity_SHAg.xyz*unity_SHAg.w + unity_SHAb.xyz*unity_SHAb.w) == 0 && length(lightDir) < 0.1)
+		if(length(L1r.xyz + L1g.xyz + L1b.xyz) == 0 && length(lightDir) < 0.1)
 		{
 			lightDir = half4(1, 1, 1, 0);
 		}
