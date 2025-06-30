@@ -6,4 +6,5 @@ The avatar shaders are designed for VRChat or similar applications. They are not
 This package also includes some niche shaders I have created as well. They may be useful in some cases.
 
 # Credits
-Some parts of this shader were derived from Xiexe's Unity Shaders, under the MIT license.
+Xiexe: Some parts of this shader were derived from Xiexe's Unity Shaders, under the MIT license.
+REDSIM: This shader implements VRC Light Volumes, and directly includes "LightVolumes.cginc" under the MIT license.
