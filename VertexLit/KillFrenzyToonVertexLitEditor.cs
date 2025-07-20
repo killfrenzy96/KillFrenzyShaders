@@ -71,7 +71,7 @@ public class KillFrenzyToonVertexLitEditor: ShaderGUI
 		if (featureEnabled.matCap) DrawMatCap(materialEditor, ref featureShow.matCap);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Avatar Toon VertexLit Shaders v0.9.11");
+		DrawLabel("KillFrenzy's Avatar Toon VertexLit Shaders v0.9.11b");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
