@@ -240,6 +240,10 @@ v2f vert(appdata v)
 		#endif
 	#endif
 
+	#ifdef KF_INSERT_FRAG_HSB
+		KF_INSERT_FRAG_HSB
+	#endif
+
 	// Emission
 	#ifdef KF_EMISSION
 		half lightScale = _ScaleWithLightSensitivity;
