@@ -116,12 +116,32 @@ fixed _VertexColorAlbedo;
 	half _MainHue;
 	half _MainSaturation;
 	half _MainBrightness;
+	#ifdef KF_HSBALT
+		UNITY_DECLARE_TEX2D_NOSAMPLER(_HSLAMaskAlt);
+		// half4 _HSLAAdjustAlt;
+		half _AltHue;
+		half _AltSaturation;
+		half _AltBrightness;
+		float _RainbowAltHueUVX;
+		float _RainbowAltHueUVY;
+		float _RainbowAltHueSpeed;
+	#endif
 	#ifdef KF_EMISSION
 		UNITY_DECLARE_TEX2D_NOSAMPLER(_HSLAMaskEmission);
 		// half4 _HSLAAdjustEmission;
 		half _EmissionHue;
 		half _EmissionSaturation;
 		half _EmissionBrightness;
+		#ifdef KF_HSBALT
+			UNITY_DECLARE_TEX2D_NOSAMPLER(_HSLAMaskEmissionAlt);
+			// half4 _HSLAAdjustEmissionAlt;
+			half _EmissionAltHue;
+			half _EmissionAltSaturation;
+			half _EmissionAltBrightness;
+			float _RainbowEmissionAltHueUVX;
+			float _RainbowEmissionAltHueUVY;
+			float _RainbowEmissionAltHueSpeed;
+		#endif
 	#endif
 	float _RainbowMainHueUVX;
 	float _RainbowMainHueUVY;

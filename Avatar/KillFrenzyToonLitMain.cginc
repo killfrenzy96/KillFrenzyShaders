@@ -230,6 +230,14 @@ v2f vert(appdata v)
 		col.rgb = lerp(dot(col.rgb, grayscaleVec), col.rgb, (_MainSaturation * hslaMask.g) + 1.0); // Main Saturation
 		col.rgb *= 1.0 + _MainBrightness * hslaMask.b; // Main Brightness
 
+		#ifdef KF_HSBALT
+			half4 hslaMaskAlt = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskAlt, _MainTex, i.uv);
+
+			col.rgb = lerp(col.rgb, applyHue(col.rgb, _RainbowAltHueUVX * i.uv.x + _RainbowAltHueUVY * i.uv.y + _RainbowAltHueSpeed * _Time.y + _AltHue), hslaMaskAlt.r); // Alt Hue
+			col.rgb = lerp(dot(col.rgb, grayscaleVec), col.rgb, (_AltSaturation * hslaMaskAlt.g) + 1.0); // Alt Saturation
+			col.rgb *= 1.0 + _AltBrightness * hslaMaskAlt.b; // Alt Brightness
+		#endif
+
 		#ifdef KF_EMISSION
 			half4 hslaMaskEmission = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskEmission, _MainTex, i.uv);
 
@@ -237,6 +245,14 @@ v2f vert(appdata v)
 			emission = lerp(emission, applyHue(emission, _RainbowEmissionHueUVX * i.uv.x + _RainbowEmissionHueUVY * i.uv.y + _RainbowEmissionHueSpeed * _Time.y + _EmissionHue), hslaMaskEmission.r); // Emission Hue
 			emission = lerp(dot(emission, grayscaleVec), emission, (_EmissionSaturation * hslaMaskEmission.g) + 1.0); // Emission Saturation
 			emission *= 1.0 + _EmissionBrightness * hslaMaskEmission.b; // Emission Brightness
+
+			#ifdef KF_HSBALT
+				half4 hslaMaskEmissionAlt = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskEmissionAlt, _MainTex, i.uv);
+
+				emission = lerp(emission, applyHue(emission, _RainbowEmissionAltHueUVX * i.uv.x + _RainbowEmissionAltHueUVY * i.uv.y + _RainbowEmissionAltHueSpeed * _Time.y + _EmissionAltHue), hslaMaskEmissionAlt.r); // Emission Hue
+				emission = lerp(dot(emission, grayscaleVec), emission, (_EmissionAltSaturation * hslaMaskEmissionAlt.g) + 1.0); // Emission Saturation
+				emission *= 1.0 + _EmissionAltBrightness * hslaMaskEmissionAlt.b; // Emission Brightness
+			#endif
 		#endif
 	#endif
 
