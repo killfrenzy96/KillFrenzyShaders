@@ -111,7 +111,7 @@ fixed _VertexColorAlbedo;
 #endif
 
 #ifdef KF_HSB
-	UNITY_DECLARE_TEX2D_NOSAMPLER(_HSLAMask);
+	UNITY_DECLARE_TEX2D(_HSLAMask);
 	// half4 _HSLAAdjust;
 	half _MainHue;
 	half _MainSaturation;

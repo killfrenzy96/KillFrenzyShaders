@@ -223,7 +223,7 @@ v2f vert(appdata v)
 
 	// Hue/Saturation/Brightness slider
 	#ifdef KF_HSB
-		half4 hslaMask = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMask, _MainTex, i.uv);
+		half4 hslaMask = UNITY_SAMPLE_TEX2D(_HSLAMask, i.uv);
 
 		// col.rgb = hue(col, half4(_HSLAAdjust.x, 0.0, _HSLAAdjust.zw), hslaMask.rgb); // Main Hue/Brightness
 		col.rgb = lerp(col.rgb, applyHue(col.rgb, _RainbowMainHueUVX * i.uv.x + _RainbowMainHueUVY * i.uv.y + _RainbowMainHueSpeed * _Time.y + _MainHue), hslaMask.r); // Main Hue
@@ -231,7 +231,7 @@ v2f vert(appdata v)
 		col.rgb *= 1.0 + _MainBrightness * hslaMask.b; // Main Brightness
 
 		#ifdef KF_HSBALT
-			half4 hslaMaskAlt = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskAlt, _MainTex, i.uv);
+			half4 hslaMaskAlt = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskAlt, _HSLAMask, i.uv);
 
 			col.rgb = lerp(col.rgb, applyHue(col.rgb, _RainbowAltHueUVX * i.uv.x + _RainbowAltHueUVY * i.uv.y + _RainbowAltHueSpeed * _Time.y + _AltHue), hslaMaskAlt.r); // Alt Hue
 			col.rgb = lerp(dot(col.rgb, grayscaleVec), col.rgb, (_AltSaturation * hslaMaskAlt.g) + 1.0); // Alt Saturation
@@ -239,7 +239,7 @@ v2f vert(appdata v)
 		#endif
 
 		#ifdef KF_EMISSION
-			half4 hslaMaskEmission = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskEmission, _MainTex, i.uv);
+			half4 hslaMaskEmission = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskEmission, _HSLAMask, i.uv);
 
 			// emission = hue(emission, half4(_HSLAAdjustEmission.x, 0.0, _HSLAAdjustEmission.zw), hslaMaskEmission); // Emission Hue/Brightness
 			emission = lerp(emission, applyHue(emission, _RainbowEmissionHueUVX * i.uv.x + _RainbowEmissionHueUVY * i.uv.y + _RainbowEmissionHueSpeed * _Time.y + _EmissionHue), hslaMaskEmission.r); // Emission Hue
@@ -247,7 +247,7 @@ v2f vert(appdata v)
 			emission *= 1.0 + _EmissionBrightness * hslaMaskEmission.b; // Emission Brightness
 
 			#ifdef KF_HSBALT
-				half4 hslaMaskEmissionAlt = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskEmissionAlt, _MainTex, i.uv);
+				half4 hslaMaskEmissionAlt = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskEmissionAlt, _HSLAMask, i.uv);
 
 				emission = lerp(emission, applyHue(emission, _RainbowEmissionAltHueUVX * i.uv.x + _RainbowEmissionAltHueUVY * i.uv.y + _RainbowEmissionAltHueSpeed * _Time.y + _EmissionAltHue), hslaMaskEmissionAlt.r); // Emission Hue
 				emission = lerp(dot(emission, grayscaleVec), emission, (_EmissionAltSaturation * hslaMaskEmissionAlt.g) + 1.0); // Emission Saturation
