@@ -164,10 +164,10 @@ fixed4 frag (v2f i) : SV_Target
 		#else
 			screenUv *= _ScreenParams.xy;
 		#endif
-		alpha += ((alphaStrength * 0.5) - (calcDither(screenUv) * alphaStrength)) * _AlphaDither;
+		col.a += ((alphaStrength * 0.5) - (calcDither(screenUv) * alphaStrength)) * _AlphaDither;
 
 		// Alpha Noise
-		alpha -= ((1.0 - _AlphaNoise * 0.5) + frac(frac(_Time.a * dot(i.uv.xy, float2(12.9898, 78.233))) * 43758.5453123)) * alphaStrength * _AlphaNoise;
+		col.a += ((alphaStrength * 0.5) - frac(frac(_Time.a * dot(i.uv.xy, float2(12.9898, 78.233))) * 43758.5453123) * alphaStrength) * _AlphaNoise - (_AlphaNoise * 0.5);
 
 		clip(alpha * (1 + _Cutoff * _AlphaToMaskSharpen) - _Cutoff);
 		alpha = clamp(alpha, 0, 1);

@@ -210,7 +210,7 @@ v2f vert(appdata v)
 		col.a += ((alphaStrength * 0.5) - (calcDither(screenUv) * alphaStrength)) * _AlphaDither;
 
 		// Alpha Noise
-		col.a -= ((1.0 - _AlphaNoise * 0.5) + frac(frac(_Time.a * dot(i.uv.xy, float2(12.9898, 78.233))) * 43758.5453123)) * alphaStrength * _AlphaNoise;
+		col.a += ((alphaStrength * 0.5) - frac(frac(_Time.a * dot(i.uv.xy, float2(12.9898, 78.233))) * 43758.5453123) * alphaStrength) * _AlphaNoise;
 
 		clip(col.a * (1 + _Cutoff * _AlphaToMaskSharpen) - _Cutoff);
 		col.a = clamp(col.a, 0, 1);
