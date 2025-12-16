@@ -104,7 +104,7 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 		if (featureEnabled.hsb) DrawHSB(materialEditor, ref featureShow.hsb);
 		DrawAdvanced(materialEditor, ref featureShow.advanced);
 
-		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.11c");
+		DrawLabel("KillFrenzy's Avatar Toon Lit Shaders v0.9.12");
 	}
 
 	private void DrawMain(MaterialEditor materialEditor, ref bool show) {
@@ -164,7 +164,8 @@ public class KillFrenzyToonLitEditor: ShaderGUI
 
 		SeparatorThin();
 		materialEditor.ShaderProperty(properties._Cutoff, new GUIContent("Cutoff", "Minimum alpha level where texture is visible."));
-		materialEditor.ShaderProperty(properties._AlphaNoise, new GUIContent("Cutoff Noise", "Applies noise to the cutoff to help smoothen the cutout."));
+		materialEditor.ShaderProperty(properties._AlphaNoise, new GUIContent("Cutoff Noise", "Applies random noise to the alpha to help smoothen the cutout."));
+		materialEditor.ShaderProperty(properties._AlphaDither, new GUIContent("Cutoff Dither", "Applies a dithering pattern to the alpha to help smoothen the cutout."));
 
 		if (!featureEnabled.transparent) {
 			SeparatorThin();
@@ -534,6 +535,7 @@ public class KillFrenzyToonLitMaterialProperties
 	public MaterialProperty _AlphaToMaskSharpen = null;
 	public MaterialProperty _Cutoff = null;
 	public MaterialProperty _AlphaNoise = null;
+	public MaterialProperty _AlphaDither = null;
 
 	public MaterialProperty _Ramp = null;
 	public MaterialProperty _RampStrength = null;

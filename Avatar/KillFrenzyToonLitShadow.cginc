@@ -23,6 +23,9 @@ struct v2f
 	#if defined(KF_CUTOUT) || defined(KF_OUTLINE)
 		float2 uv: TEXCOORD0;
 	#endif
+	#ifdef KF_CUTOUT
+		fixed4 screenPos: TEXCOORD1;
+	#endif
 	UNITY_VERTEX_OUTPUT_STEREO
 };
 
@@ -36,6 +39,7 @@ struct v2f
 
 	fixed _Cutoff;
 	fixed _AlphaNoise;
+	fixed _AlphaDither;
 	fixed _AlphaToMaskSharpen;
 	float4 _MainTex_TexelSize;
 #endif
@@ -65,15 +69,18 @@ v2f vert (appdata v)
 
 	#ifdef KF_CUTOUT
 		o.color = v.color;
+
+		float4 pos = UnityObjectToClipPos(v.vertex);
+		o.screenPos = ComputeScreenPos(pos);
 	#endif
 
 	#if defined(KF_CUTOUT) || defined(KF_OUTLINE)
-		o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+		o.uv.xy = TRANSFORM_TEX(v.uv, _MainTex);
 	#endif
 
 	#ifdef KF_OUTLINE
 		float3 worldPos = mul(unity_ObjectToWorld, v.vertex);
-		half outlineWidthMask = tex2Dlod(_OutlineMask, float4(o.uv, 0, 0)).r;
+		half outlineWidthMask = tex2Dlod(_OutlineMask, float4(o.uv.xy, 0, 0)).r;
 		half cameraDistance = distance(worldPos, _WorldSpaceCameraPos);
 		half outlineWidth = outlineWidthMask * _OutlineWidth;
 
@@ -94,23 +101,76 @@ v2f vert (appdata v)
 	return o;
 }
 
+inline half Dither8x8Bayer( int x, int y )
+{
+	const half dither[ 64 ] = {
+		 1, 49, 13, 61,  4, 52, 16, 64,
+		33, 17, 45, 29, 36, 20, 48, 32,
+		 9, 57,  5, 53, 12, 60,  8, 56,
+		41, 25, 37, 21, 44, 28, 40, 24,
+		 3, 51, 15, 63,  2, 50, 14, 62,
+		35, 19, 47, 31, 34, 18, 46, 30,
+		11, 59,  7, 55, 10, 58,  6, 54,
+		43, 27, 39, 23, 42, 26, 38, 22
+	};
+	int r = y * 8 + x;
+	return dither[r] / 64;
+}
+
+half calcDither(half2 screenPos)
+{
+	half dither = Dither8x8Bayer(fmod(screenPos.x, 8), fmod(screenPos.y, 8));
+	return dither;
+}
+
 fixed4 frag (v2f i) : SV_Target
 {
 	#ifdef KF_INSERT_FRAG_START
 		KF_INSERT_FRAG_START
 	#endif
 
+	// #ifdef KF_CUTOUT
+	// 	// Main alpha
+	// 	fixed alpha = tex2D(_MainTex, i.uv.xy).a;
+
+	// 	// Vertex alpha
+	// 	alpha *= lerp(1, i.color.a, _VertexColorAlbedo);
+
+	// 	// Cutout
+	// 	alpha = lerp(alpha, (alpha - _Cutoff) / max(fwidth(alpha), 0.0001) + 0.5, _AlphaToMaskSharpen);
+	// 	alpha *= (1.0 - _AlphaNoise * 0.5) + frac(frac(_Time.a * dot(i.uv.xy, float2(12.9898, 78.233))) * 43758.5453123) * _AlphaNoise;
+	// 	clip(alpha * (1 + _Cutoff) - _Cutoff);
+	// #endif
+
+	// Cutout
 	#ifdef KF_CUTOUT
-		// Main alpha
-		fixed alpha = tex2D(_MainTex, i.uv).a;
+		fixed alpha = tex2D(_MainTex, i.uv.xy).a;
 
 		// Vertex alpha
 		alpha *= lerp(1, i.color.a, _VertexColorAlbedo);
 
-		// Cutout
-		alpha = lerp(alpha, (alpha - _Cutoff) / max(fwidth(alpha), 0.0001) + 0.5, _AlphaToMaskSharpen);
-		alpha *= (1.0 - _AlphaNoise * 0.5) + frac(frac(_Time.a * dot(i.uv, float2(12.9898, 78.233))) * 43758.5453123) * _AlphaNoise;
-		clip(alpha * (1 + _Cutoff) - _Cutoff);
+		// alpha *= 1 + CalcMipLevel(i.uv.xy * _MainTex_TexelSize.zw) * 0.25;
+		#ifndef KF_TRANSPARENT
+			alpha = lerp(alpha, (alpha - _Cutoff) / max(fwidth(alpha), 0.0001) + 0.5, _AlphaToMaskSharpen);
+		#endif
+
+		// Strength of dither/noise (Fast sin approximation between 0 and 1)
+		half alphaStrength = 4 * alpha * (1 - alpha);
+
+		// Alpha Dither
+		float2 screenUv = i.screenPos.xy / (i.screenPos.w + 0.0000000001); //0.0x1 Stops division by 0 warning in console.
+		#if UNITY_SINGLE_PASS_STEREO
+			screenUv *= half2(_ScreenParams.x * 2, _ScreenParams.y);
+		#else
+			screenUv *= _ScreenParams.xy;
+		#endif
+		alpha += ((alphaStrength * 0.5) - (calcDither(screenUv) * alphaStrength)) * _AlphaDither;
+
+		// Alpha Noise
+		alpha -= ((1.0 - _AlphaNoise * 0.5) + frac(frac(_Time.a * dot(i.uv.xy, float2(12.9898, 78.233))) * 43758.5453123)) * alphaStrength * _AlphaNoise;
+
+		clip(alpha * (1 + _Cutoff * _AlphaToMaskSharpen) - _Cutoff);
+		alpha = clamp(alpha, 0, 1);
 	#endif
 
 	#ifdef KF_INSERT_FRAG_END

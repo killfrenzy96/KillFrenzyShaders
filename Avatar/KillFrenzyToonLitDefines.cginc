@@ -32,6 +32,7 @@ fixed _VertexColorAlbedo;
 #ifdef KF_CUTOUT
 	fixed _Cutoff;
 	fixed _AlphaNoise;
+	fixed _AlphaDither;
 	fixed _AlphaToMaskSharpen;
 	float4 _MainTex_TexelSize;
 #endif
@@ -188,21 +189,24 @@ struct v2f
 	half3 normal: TEXCOORD3;
 	half3 worldNormal: TEXCOORD4;
 	float3 worldPos: TEXCOORD5;
+	#ifdef KF_CUTOUT
+		float4 screenPos: TEXCOORD6;
+	#endif
 	#ifdef KF_NORMAL
-		float4 normalUV: TEXCOORD6;
-		// float2 detailNormalUV: TEXCOORD7;
-		half3 tspace0: TEXCOORD7; // tangent.x, bitangent.x, normal.x
-		half3 tspace1: TEXCOORD8; // tangent.y, bitangent.y, normal.y
-		half3 tspace2: TEXCOORD9; // tangent.z, bitangent.z, normal.z
+		float4 normalUV: TEXCOORD7;
+		// float2 detailNormalUV: TEXCOORD8;
+		half3 tspace0: TEXCOORD8; // tangent.x, bitangent.x, normal.x
+		half3 tspace1: TEXCOORD9; // tangent.y, bitangent.y, normal.y
+		half3 tspace2: TEXCOORD10; // tangent.z, bitangent.z, normal.z
 	#endif
 	#ifdef KF_OUTLINE
-		half4 outlineColor: TEXCOORD10;
+		half4 outlineColor: TEXCOORD11;
 	#endif
 	#ifdef KF_VERTEX
-		float4 light: TEXCOORD11;
+		float4 light: TEXCOORD12;
 	#endif
 	#ifdef LIGHTMAP_ON
-		float2 lightmapUv: TEXCOORD12;
+		float2 lightmapUv: TEXCOORD13;
 	#endif
 	#ifdef KF_INSERT_FRAG_INPUT
 		KF_INSERT_FRAG_INPUT

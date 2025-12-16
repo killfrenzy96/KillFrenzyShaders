@@ -54,14 +54,22 @@ v2f vert(appdata v)
 	o.worldNormal = UnityObjectToWorldNormal(v.normal);
 	o.color = v.color;
 	o.normal = v.normal;
-	o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+	o.uv.xy = TRANSFORM_TEX(v.uv.xy, _MainTex);
+
+	#ifdef KF_CUTOUT
+		#ifdef KF_OUTLINE
+			o.screenPos = ComputeScreenPos(o.pos);
+		#else
+			o.screenPos = ComputeScreenPos(o.pos);
+		#endif
+	#endif
 
 	#ifdef LIGHTMAP_ON
 		o.lightmapUv = v.uv2 * unity_LightmapST.xy + unity_LightmapST.zw;
 	#endif
 
 	#ifdef KF_OUTLINE
-		half outlineWidthMask = tex2Dlod(_OutlineMask, float4(o.uv, 0, 0)).r;
+		half outlineWidthMask = tex2Dlod(_OutlineMask, float4(o.uv.xy, 0, 0)).r;
 		o.outlineColor = half4(
 			outlineWidthMask, // Outline Width Mask
 			distance(o.worldPos, _WorldSpaceCameraPos), // Camera Distance
@@ -118,7 +126,7 @@ v2f vert(appdata v)
 	#endif
 
 	#ifdef SHADOW_COORDS
-		UNITY_TRANSFER_SHADOW(o, o.uv);
+		UNITY_TRANSFER_SHADOW(o, o.uv.xy);
 	#endif
 	UNITY_TRANSFER_FOG(o, o.pos);
 	return o;
@@ -142,11 +150,11 @@ v2f vert(appdata v)
 	#endif
 
 	// Main colour
-	half4 col = UNITY_SAMPLE_TEX2D(_MainTex, i.uv) * _Color;
+	half4 col = UNITY_SAMPLE_TEX2D(_MainTex, i.uv.xy) * _Color;
 
 	// Alt colour
 	#ifdef KF_TEXTUREALT
-		col = lerp(col, UNITY_SAMPLE_TEX2D_SAMPLER(_AltTex, _MainTex, i.uv) * _AltColor, _AltTexStrength);
+		col = lerp(col, UNITY_SAMPLE_TEX2D_SAMPLER(_AltTex, _MainTex, i.uv.xy) * _AltColor, _AltTexStrength);
 	#endif
 
 	// Vertex colour
@@ -184,11 +192,26 @@ v2f vert(appdata v)
 
 	// Cutout
 	#ifdef KF_CUTOUT
-		// col.a *= 1 + CalcMipLevel(i.uv * _MainTex_TexelSize.zw) * 0.25;
+		// col.a *= 1 + CalcMipLevel(i.uv.xy * _MainTex_TexelSize.zw) * 0.25;
 		#ifndef KF_TRANSPARENT
 			col.a = lerp(col.a, (col.a - _Cutoff) / max(fwidth(col.a), 0.0001) + 0.5, _AlphaToMaskSharpen);
 		#endif
-		col.a *= (1.0 - _AlphaNoise * 0.5) + frac(frac(_Time.a * dot(i.uv, float2(12.9898, 78.233))) * 43758.5453123) * _AlphaNoise;
+
+		// Strength of dither/noise (Fast sin approximation between 0 and 1)
+		half alphaStrength = 4 * col.a * (1 - col.a);
+
+		// Alpha Dither
+		float2 screenUv = i.screenPos.xy / (i.screenPos.w + 0.0000000001); //0.0x1 Stops division by 0 warning in console.
+		#if UNITY_SINGLE_PASS_STEREO
+			screenUv *= half2(_ScreenParams.x * 2, _ScreenParams.y);
+		#else
+			screenUv *= _ScreenParams.xy;
+		#endif
+		col.a += ((alphaStrength * 0.5) - (calcDither(screenUv) * alphaStrength)) * _AlphaDither;
+
+		// Alpha Noise
+		col.a -= ((1.0 - _AlphaNoise * 0.5) + frac(frac(_Time.a * dot(i.uv.xy, float2(12.9898, 78.233))) * 43758.5453123)) * alphaStrength * _AlphaNoise;
+
 		clip(col.a * (1 + _Cutoff * _AlphaToMaskSharpen) - _Cutoff);
 		col.a = clamp(col.a, 0, 1);
 	#endif
@@ -197,7 +220,7 @@ v2f vert(appdata v)
 	#ifdef KF_NORMAL
 		half3 nMap = UnpackScaleNormal(UNITY_SAMPLE_TEX2D_SAMPLER(_BumpMap, _MainTex, i.normalUV.xy), _BumpScale);
 		half3 detNMap = UnpackScaleNormal(UNITY_SAMPLE_TEX2D_SAMPLER(_DetailNormalMap, _MainTex, i.normalUV.zw), _DetailNormalMapScale);
-		half detailMask = UNITY_SAMPLE_TEX2D_SAMPLER(_DetailMask, _MainTex, i.uv).r;
+		half detailMask = UNITY_SAMPLE_TEX2D_SAMPLER(_DetailMask, _MainTex, i.uv.xy).r;
 
 		half3 blendedNormal = lerp(nMap, BlendNormals(nMap, detNMap), detailMask);
 
@@ -213,9 +236,9 @@ v2f vert(appdata v)
 
 	// Emission colour
 	#ifdef KF_EMISSION
-		half4 emissionMap = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionMap, _MainTex, i.uv) * _EmissionColor;
+		half4 emissionMap = UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionMap, _MainTex, i.uv.xy) * _EmissionColor;
 		#ifdef KF_EMISSIONALT
-			emissionMap = lerp(emissionMap, UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionMapAlt, _MainTex, i.uv) * _EmissionAltColor, _EmissionMapAltStrength);
+			emissionMap = lerp(emissionMap, UNITY_SAMPLE_TEX2D_SAMPLER(_EmissionMapAlt, _MainTex, i.uv.xy) * _EmissionAltColor, _EmissionMapAltStrength);
 		#endif
 		half3 emission = emissionMap.rgb;
 		emission.rgb *= emissionMap.a;
@@ -223,7 +246,7 @@ v2f vert(appdata v)
 
 	// Hue/Saturation/Brightness slider
 	#ifdef KF_HSB
-		half4 hslaMask = UNITY_SAMPLE_TEX2D(_HSLAMask, i.uv);
+		half4 hslaMask = UNITY_SAMPLE_TEX2D(_HSLAMask, i.uv.xy);
 
 		// col.rgb = hue(col, half4(_HSLAAdjust.x, 0.0, _HSLAAdjust.zw), hslaMask.rgb); // Main Hue/Brightness
 		col.rgb = lerp(col.rgb, applyHue(col.rgb, _RainbowMainHueUVX * i.uv.x + _RainbowMainHueUVY * i.uv.y + _RainbowMainHueSpeed * _Time.y + _MainHue), hslaMask.r); // Main Hue
@@ -231,7 +254,7 @@ v2f vert(appdata v)
 		col.rgb *= 1.0 + _MainBrightness * hslaMask.b; // Main Brightness
 
 		#ifdef KF_HSBALT
-			half4 hslaMaskAlt = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskAlt, _HSLAMask, i.uv);
+			half4 hslaMaskAlt = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskAlt, _HSLAMask, i.uv.xy);
 
 			col.rgb = lerp(col.rgb, applyHue(col.rgb, _RainbowAltHueUVX * i.uv.x + _RainbowAltHueUVY * i.uv.y + _RainbowAltHueSpeed * _Time.y + _AltHue), hslaMaskAlt.r); // Alt Hue
 			col.rgb = lerp(dot(col.rgb, grayscaleVec), col.rgb, (_AltSaturation * hslaMaskAlt.g) + 1.0); // Alt Saturation
@@ -239,7 +262,7 @@ v2f vert(appdata v)
 		#endif
 
 		#ifdef KF_EMISSION
-			half4 hslaMaskEmission = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskEmission, _HSLAMask, i.uv);
+			half4 hslaMaskEmission = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskEmission, _HSLAMask, i.uv.xy);
 
 			// emission = hue(emission, half4(_HSLAAdjustEmission.x, 0.0, _HSLAAdjustEmission.zw), hslaMaskEmission); // Emission Hue/Brightness
 			emission = lerp(emission, applyHue(emission, _RainbowEmissionHueUVX * i.uv.x + _RainbowEmissionHueUVY * i.uv.y + _RainbowEmissionHueSpeed * _Time.y + _EmissionHue), hslaMaskEmission.r); // Emission Hue
@@ -247,7 +270,7 @@ v2f vert(appdata v)
 			emission *= 1.0 + _EmissionBrightness * hslaMaskEmission.b; // Emission Brightness
 
 			#ifdef KF_HSBALT
-				half4 hslaMaskEmissionAlt = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskEmissionAlt, _HSLAMask, i.uv);
+				half4 hslaMaskEmissionAlt = UNITY_SAMPLE_TEX2D_SAMPLER(_HSLAMaskEmissionAlt, _HSLAMask, i.uv.xy);
 
 				emission = lerp(emission, applyHue(emission, _RainbowEmissionAltHueUVX * i.uv.x + _RainbowEmissionAltHueUVY * i.uv.y + _RainbowEmissionAltHueSpeed * _Time.y + _EmissionAltHue), hslaMaskEmissionAlt.r); // Emission Hue
 				emission = lerp(dot(emission, grayscaleVec), emission, (_EmissionAltSaturation * hslaMaskEmissionAlt.g) + 1.0); // Emission Saturation
@@ -412,7 +435,7 @@ v2f vert(appdata v)
 
 	// Cubemap / Matcap Part 1
 	#if defined(KF_CUBEMAP) || defined(KF_MATCAP)
-		half4 reflectivityMask = UNITY_SAMPLE_TEX2D_SAMPLER(_ReflectivityMask, _MainTex, i.uv);
+		half4 reflectivityMask = UNITY_SAMPLE_TEX2D_SAMPLER(_ReflectivityMask, _MainTex, i.uv.xy);
 	#endif
 
 	// Cubemap
@@ -464,7 +487,7 @@ v2f vert(appdata v)
 		half3 reflLight = normalize(reflect(lightDir, i.worldNormal));
 		half dotRdv = saturate(dot(reflLight, half4(-viewDir, 0)));
 
-		fixed3 specularMap = UNITY_SAMPLE_TEX2D_SAMPLER(_SpecularMap, _MainTex, i.uv).rgb;
+		fixed3 specularMap = UNITY_SAMPLE_TEX2D_SAMPLER(_SpecularMap, _MainTex, i.uv.xy).rgb;
 		half specularIntensity = _SpecularIntensity * specularMap.r;
 		half smoothness = max(0.01, (_SpecularArea * specularMap.b));
 		smoothness *= 1.7 - 0.7 * smoothness;
@@ -596,7 +619,15 @@ v2f vert(appdata v)
 				[unroll]
 				for (int j = 2; j >= 0; j--) {
 					IN[j].vertex.xyz += normalize(IN[j].normal) * outlineWidth[j];
-					IN[j].pos = UnityObjectToClipPos(IN[j].vertex.xyz);
+
+					#ifdef KF_CUTOUT
+						float4 pos = UnityObjectToClipPos(IN[j].vertex.xyz);
+						IN[j].pos = pos;
+						IN[j].screenPos = ComputeScreenPos(pos);
+					#else
+						IN[j].pos = UnityObjectToClipPos(IN[j].vertex.xyz);
+					#endif
+
 					IN[j].outlineColor = half4(lerp(_OutlineColor.rgb, 1.0, (1.0 - outlineVisibility) * _OutlineFade), outlineWidthMask[j]);
 
 					#ifdef KF_INSERT_GEOM_OUTLINE_LOOP
