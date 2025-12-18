@@ -155,8 +155,8 @@ fixed4 frag (v2f i) : SV_Target
 		#endif
 
 		// Strength of dither/noise
+		uint msaaSamples = GetRenderTargetSampleCount();
 		half alphaStrength = step(0.005, alpha) * step(alpha, 0.995); // Disable cutout processing for low and high alpha values
-		half alphaOffset = (alpha - 0.5) * alphaStrength * 0.5; // 0.5 assumes maximum 4x MSAA (0x for 2x MSAA, 0.75 for 8xMSAA)
 
 		// Alpha Dither
 		float2 screenUv = i.screenPos.xy / (i.screenPos.w + 0.0000000001); //0.0x1 Stops division by 0 warning in console.
@@ -165,12 +165,12 @@ fixed4 frag (v2f i) : SV_Target
 		#else
 			screenUv *= _ScreenParams.xy;
 		#endif
-		half alphaDitherOffset = alphaOffset * _AlphaDither;
-		half alphaDither = ((calcDither(screenUv) * alphaStrength) - (alphaStrength * 0.5)) * _AlphaDither + alphaDitherOffset;
+		half alphaDitherMultiplier = _AlphaDither / msaaSamples;
+		half alphaDither = (calcDither(screenUv) * alphaStrength - (alphaStrength * 0.5)) * alphaDitherMultiplier;
 
 		// Alpha Noise
-		half alphaNoiseOffset = alphaOffset * _AlphaNoise;
-		half alphaNoise = (frac(frac(_Time.a * dot(i.uv.xy, float2(12.9898, 78.233))) * 43758.5453123) * alphaStrength - (alphaStrength * 0.5)) * _AlphaNoise + alphaNoiseOffset;
+		half alphaNoiseMultiplier = _AlphaNoise / msaaSamples;
+		half alphaNoise = (frac(frac(_Time.a * dot(i.uv.xy, float2(12.9898, 78.233))) * 43758.5453123) * alphaStrength - (alphaStrength * 0.5)) * alphaNoiseMultiplier;
 
 		// Merge and apply
 		alpha += alphaDither + alphaNoise;

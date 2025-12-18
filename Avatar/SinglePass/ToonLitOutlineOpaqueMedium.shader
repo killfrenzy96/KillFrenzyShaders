@@ -28,7 +28,7 @@
 		// _AlphaToMaskSharpen("Alpha To Mask Sharpen", Range(0,1)) = 1
 		// _Cutoff("Cutoff Alpha", Range(0,1)) = 0.01
 		// _AlphaNoise("Cutoff Noise", Range(0,2)) = 0.0
-		// _AlphaDither("Cutoff Dither", Range(0,2)) = 0.0
+		// _AlphaDither("Cutoff Dither", Range(0,1)) = 0.0
 
 
 		[NoScaleOffset]_Ramp("Shadow Ramp", 2D) = "white" {}
@@ -140,6 +140,7 @@
 			#pragma target 4.0
 			#pragma vertex vert
 			#pragma geometry geom
+			#pragma require geometry
 			#pragma fragment frag
 
 			#pragma multi_compile _ VERTEXLIGHT_ON

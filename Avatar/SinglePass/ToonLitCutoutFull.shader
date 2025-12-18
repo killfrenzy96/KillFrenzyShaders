@@ -28,7 +28,7 @@
 		_AlphaToMaskSharpen("Alpha To Mask Sharpen", Range(0,1)) = 1
 		_Cutoff("Cutoff Alpha", Range(0,1)) = 0.01
 		_AlphaNoise("Cutoff Noise", Range(0,2)) = 0.0
-		_AlphaDither("Cutoff Dither", Range(0,2)) = 0.0
+		_AlphaDither("Cutoff Dither", Range(0,1)) = 0.0
 
 
 		[NoScaleOffset]_Ramp("Shadow Ramp", 2D) = "white" {}
@@ -137,7 +137,7 @@
 			AlphaToMask [_AlphaMask]
 
 			CGPROGRAM
-			#pragma target 3.0
+			#pragma target 4.5
 			#pragma vertex vert
 			#pragma fragment frag
 
@@ -177,7 +177,7 @@
 			ZTest LEqual
 
 			CGPROGRAM
-			#pragma target 3.0
+			#pragma target 4.5
 			#pragma vertex vert
 			#pragma fragment frag
 
