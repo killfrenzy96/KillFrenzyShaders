@@ -154,8 +154,9 @@ fixed4 frag (v2f i) : SV_Target
 			alpha = lerp(alpha, (alpha - _Cutoff) / max(fwidth(alpha), 0.0001) + 0.5, _AlphaToMaskSharpen);
 		#endif
 
-		// Strength of dither/noise (Fast sin approximation between 0 and 1)
-		half alphaStrength = 4 * alpha * (1 - alpha);
+		// Strength of dither/noise
+		half alphaStrength = step(0.005, alpha) * step(alpha, 0.995); // Disable cutout processing for low and high alpha values
+		half alphaOffset = (alpha - 0.5) * alphaStrength * 0.5; // 0.5 assumes maximum 4x MSAA (0x for 2x MSAA, 0.75 for 8xMSAA)
 
 		// Alpha Dither
 		float2 screenUv = i.screenPos.xy / (i.screenPos.w + 0.0000000001); //0.0x1 Stops division by 0 warning in console.
@@ -164,13 +165,17 @@ fixed4 frag (v2f i) : SV_Target
 		#else
 			screenUv *= _ScreenParams.xy;
 		#endif
-		col.a += ((alphaStrength * 0.5) - (calcDither(screenUv) * alphaStrength)) * _AlphaDither;
+		half alphaDitherOffset = alphaOffset * _AlphaDither;
+		half alphaDither = ((calcDither(screenUv) * alphaStrength) - (alphaStrength * 0.5)) * _AlphaDither + alphaDitherOffset;
 
 		// Alpha Noise
-		col.a += ((alphaStrength * 0.5) - frac(frac(_Time.a * dot(i.uv.xy, float2(12.9898, 78.233))) * 43758.5453123) * alphaStrength) * _AlphaNoise - (_AlphaNoise * 0.5);
+		half alphaNoiseOffset = alphaOffset * _AlphaNoise;
+		half alphaNoise = (frac(frac(_Time.a * dot(i.uv.xy, float2(12.9898, 78.233))) * 43758.5453123) * alphaStrength - (alphaStrength * 0.5)) * _AlphaNoise + alphaNoiseOffset;
 
-		clip(alpha * (1 + _Cutoff * _AlphaToMaskSharpen) - _Cutoff);
+		// Merge and apply
+		alpha += alphaDither + alphaNoise;
 		alpha = clamp(alpha, 0, 1);
+		clip(alpha * (1 + _Cutoff * _AlphaToMaskSharpen) - _Cutoff);
 	#endif
 
 	#ifdef KF_INSERT_FRAG_END
