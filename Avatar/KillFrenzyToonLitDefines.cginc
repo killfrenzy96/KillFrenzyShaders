@@ -91,6 +91,7 @@ fixed _VertexColorAlbedo;
 	sampler2D _OutlineMask;
 	fixed4 _OutlineColor;
 	fixed _OutlineWidth;
+	fixed _OutlineExpandWithDistance;
 	fixed _OutlineFade;
 #endif
 
