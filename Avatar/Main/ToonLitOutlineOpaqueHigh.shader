@@ -75,7 +75,7 @@
 		[HDR]_OutlineColor("Outline Color", Color) = (0.25,0.25,0.25,1)
 		[NoScaleOffset]_OutlineMask("Outline Mask", 2D) = "white" {}
 		_OutlineWidth("Outline Width", Range(0, 2)) = 0.075
-		_OutlineExpandWithDistance("Outline Expand with Distance", Range(0, 2)) = 1.75
+		_OutlineExpandWithDistance("Outline Expand with Distance", Range(0, 2)) = 1
 		_OutlineFade("Outline Fade", Range(0, 1)) = 1
 
 
