@@ -157,7 +157,11 @@ fixed4 frag (v2f i) : SV_Target
 		#endif
 
 		// Strength of dither/noise
-		uint msaaSamples = GetRenderTargetSampleCount();
+		#if defined(SHADER_API_D3D11) || defined(SHADER_API_D3D12)
+			uint msaaSamples = GetRenderTargetSampleCount();
+		#else
+			uint msaaSamples = 1;
+		#endif
 		half alphaStrength = step(0.005, alpha) * step(alpha, 0.995); // Disable cutout processing for low and high alpha values
 
 		// Alpha Dither
