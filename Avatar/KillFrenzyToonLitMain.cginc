@@ -198,7 +198,11 @@ v2f vert(appdata v)
 		#endif
 
 		// Strength of dither/noise
-		uint msaaSamples = GetRenderTargetSampleCount();
+		#if defined(SHADER_API_D3D11) || defined(SHADER_API_D3D12)
+			uint msaaSamples = GetRenderTargetSampleCount();
+		#else
+			uint msaaSamples = 1;
+		#endif
 		half alphaStrength = step(0.005, col.a) * step(col.a, 0.995); // Disable cutout processing for low and high alpha values
 
 		// Alpha Dither
